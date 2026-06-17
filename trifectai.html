@@ -1,0 +1,2534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrifectAI — Invoice Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;500;600;700&family=Source+Serif+4:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:         #1C2B3A;
+    --navy-hover:   #152333;
+    --navy-deep:    #0F1B28;
+    --steel:        #1A3A5C;
+    --steel-light:  #2D5F8A;
+    --steel-muted:  #234C72;
+    --grey-blue:    #6B7F8E;
+    --grey-mid:     #94A3AE;
+    --grey-light:   #C4CDD3;
+    --border:       #D8DDE1;
+    --border-light: #E8ECEF;
+    --bg:           #F0EFED;
+    --bg-mid:       #E8E7E4;
+    --bg-panel:     #F5F4F2;
+    --surface:      #FFFFFF;
+    --surface2:     #F5F4F2;
+    --white:        #FFFFFF;
+    --text-dark:    #1A2530;
+    --text-mid:     #3D5166;
+    --text-soft:    #617080;
+    --text-faint:   #8A9BAA;
+    --accent:       #C0392B;
+    --accent-hover: #A93226;
+    --success:      #16A34A;
+    --warn:         #D97706;
+    --error:        #DC2626;
+    --text:         #1A2530;
+    --muted:        #8A9BAA;
+    --radius-sm:    6px;
+    --radius:       10px;
+    --radius-lg:    14px;
+    --radius-xl:    20px;
+    --shadow-xs:    0 1px 3px rgba(15,27,40,.06);
+    --shadow-sm:    0 2px 6px rgba(15,27,40,.09);
+    --shadow-md:    0 4px 16px rgba(15,27,40,.12);
+    --shadow-lg:    0 8px 28px rgba(15,27,40,.16);
+    --t:            0.16s ease;
+    --sans:         'Source Sans 3', sans-serif;
+    --serif:        'Source Serif 4', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-dark);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 11px;
+    text-decoration: none;
+  }
+  .logo-wordmark {
+    display: flex; flex-direction: column;
+    line-height: 1; gap: 3px;
+  }
+  .logo-mark {
+    font-family: var(--serif); font-weight: 700; font-size: 18px;
+    color: var(--navy);
+    letter-spacing: 0.01em;
+  }
+  .logo-sub {
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.13em; text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .engine-badges {
+    display: flex; gap: 6px;
+  }
+  .badge {
+    font-family: var(--sans); font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+    padding: 3px 10px; text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-faint);
+    background: var(--white);
+  }
+  .badge.du  { border-color: #BFDBFE; color: var(--steel-light); background: #EFF6FF; }
+  .badge.vis { border-color: #BBF7D0; color: #166534; background: #F0FDF4; }
+  .badge.gem { border-color: #FED7AA; color: #9A3412; background: #FFF7ED; }
+  .badge.grk { border-color: #C4B5FD; color: #5B21B6; background: #F5F3FF; }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    border-right: 1px solid var(--border);
+    padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 24px;
+    overflow-y: auto;
+    background: var(--bg-panel);
+  }
+  .left-panel::-webkit-scrollbar { width: 4px; }
+  .left-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .panel-label {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-faint);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+  }
+  .panel-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border-light);
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--t);
+    position: relative;
+    background: var(--white);
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--steel-light);
+    background: #EFF6FF;
+  }
+  .drop-zone.drag-over { transform: scale(1.01); }
+  .drop-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+  }
+  .drop-icon {
+    width: 52px; height: 52px; margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--bg-mid);
+  }
+  .drop-icon svg { width: 22px; height: 22px; stroke: var(--steel-light); fill: none; stroke-width: 1.5; }
+  .drop-title {
+    font-weight: 600; font-size: 14px; margin-bottom: 5px;
+    color: var(--text-dark);
+  }
+  .drop-sub {
+    font-size: 12px; color: var(--text-faint);
+  }
+  .file-selected {
+    display: none;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: var(--radius); padding: 12px 14px;
+    align-items: center; gap: 12px;
+    margin-top: 10px;
+  }
+  .file-selected.show { display: flex; }
+  .file-icon { flex-shrink:0; }
+  .file-icon svg { width:18px;height:18px;stroke:var(--steel-light);fill:none;stroke-width:1.5; }
+  .file-name { font-size:12px;font-weight:600;color:var(--text-mid);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+  .file-size { font-size:11px;color:var(--text-faint);flex-shrink:0; }
+  .btn-clear {
+    background:none;border:none;cursor:pointer;color:var(--text-faint);padding:2px;
+    display:flex;align-items:center; transition: color var(--t);
+  }
+  .btn-clear:hover { color: var(--error); }
+  .btn-clear svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2; }
+
+  /* Analyze button */
+  .btn-analyze {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--navy);
+    color: var(--white);
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--sans); font-weight: 700; font-size: 12px;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    cursor: pointer;
+    transition: all var(--t);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-analyze:hover:not(:disabled) {
+    background: var(--steel);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-analyze:disabled {
+    opacity: .45; cursor: not-allowed;
+    box-shadow: none;
+  }
+  .btn-analyze.loading {
+    background: var(--bg-mid); color: var(--text-soft);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  /* Engine status */
+  .engine-status {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .engine-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 9px 12px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: all var(--t);
+    box-shadow: var(--shadow-xs);
+  }
+  .engine-row.active { border-color: #93C5FD; background: #EFF6FF; }
+  .engine-row.done   { border-color: #86EFAC; background: #F0FDF4; }
+  .engine-row.error  { border-color: #FCA5A5; background: #FEF2F2; }
+  .engine-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--border); flex-shrink: 0;
+    transition: background var(--t);
+  }
+  .engine-row.active .engine-dot { background: var(--steel-light); animation: pulse 1s infinite; }
+  .engine-row.done   .engine-dot { background: var(--success); animation: none; }
+  .engine-row.error  .engine-dot { background: var(--error); animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .engine-name { font-size:12px;font-weight:500;color:var(--text-mid);flex:1; }
+  .engine-tag {
+    font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+    padding:2px 8px; border-radius: var(--radius-sm);
+    color: var(--text-faint); background: var(--bg-mid);
+  }
+  .engine-row.done .engine-tag  { background:#DCFCE7;color:#16A34A; }
+  .engine-row.active .engine-tag{ background:#DBEAFE;color:var(--steel-light); }
+  .engine-row.error .engine-tag { background:#FEE2E2;color:var(--error); }
+
+  /* stats */
+  .extraction-stats {
+    display: none; gap: 6px;
+  }
+  .extraction-stats.show { display: flex; }
+  .stat-box {
+    flex:1; padding:12px 10px; background:var(--white);
+    border:1px solid var(--border); border-radius:var(--radius-sm); text-align:center;
+    box-shadow: var(--shadow-xs);
+  }
+  .stat-val { font-family:var(--sans);font-weight:700;font-size:20px;color:var(--navy); }
+  .stat-lbl { font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint);margin-top:3px; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    padding: 32px 40px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+  .right-panel::-webkit-scrollbar { width: 4px; }
+  .right-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Empty state */
+  .empty-state {
+    height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px; text-align: center;
+    color: var(--text-faint);
+  }
+  .empty-glyph {
+    font-size: 52px; opacity: .25;
+    font-family: var(--serif);
+    line-height: 1; color: var(--navy);
+  }
+  .empty-state h2 { font-family: var(--serif); font-size: 18px; color: var(--navy); font-weight: 700; }
+  .empty-state p  { font-size: 13px; color: var(--text-soft); max-width: 340px; line-height: 1.65; }
+
+  /* Results */
+  .results-wrap { display: none; }
+  .results-wrap.show { display: block; }
+
+  .result-section {
+    margin-bottom: 32px;
+    animation: fadeUp .35s ease forwards;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .section-title {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-faint);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .section-title .section-count {
+    background: var(--bg-mid); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 1px 8px;
+    font-size: 10px; font-weight: 600; color: var(--text-mid);
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border-light); }
+
+  /* Field grid */
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 6px;
+  }
+  .field-card.full-width { grid-column: unset; }  /* never span full width */
+  .field-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    transition: box-shadow var(--t), border-color var(--t);
+    box-shadow: var(--shadow-xs);
+  }
+  .field-card:hover { border-color: var(--grey-mid); box-shadow: var(--shadow-sm); }
+  .field-card.full-width { grid-column: 1/-1; }
+  .field-key {
+    font-size: 9px; font-weight: 700; color: var(--text-faint);
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 5px;
+  }
+  .field-val {
+    font-size: 13px; font-weight: 500; color: var(--text-dark);
+    word-break: break-all; white-space: pre-wrap; line-height: 1.5;
+  }
+  .field-val.amount { color: var(--navy); font-weight: 700; font-size: 14px; }
+  .conf-row {
+    display: flex; align-items: center; gap: 7px; margin-top: 8px;
+  }
+  .conf-bar {
+    flex: 1; height: 3px; background: var(--border-light); border-radius: 2px;
+    overflow: hidden;
+  }
+  .conf-fill {
+    height: 100%; border-radius: 2px;
+    transition: width .6s ease;
+  }
+  .conf-fill.high   { background: var(--success); }
+  .conf-fill.medium { background: var(--warn); }
+  .conf-fill.low    { background: var(--error); }
+  .conf-pct {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+    flex-shrink: 0; min-width: 30px; text-align: right;
+  }
+  .conf-pct.high   { color: var(--success); }
+  .conf-pct.medium { color: var(--warn); }
+  .conf-pct.low    { color: var(--error); }
+
+  /* ── Editable field cards ── */
+  .field-card.is-low {
+    border-color: #FECACA;
+    cursor: pointer;
+  }
+  .field-card.is-low:hover {
+    border-color: var(--error);
+    box-shadow: 0 0 0 2px rgba(220,38,38,.08);
+  }
+  .field-card.is-low .field-val { color: var(--error); }
+  .field-card:not(.is-overridden):not(.is-editing):not(.is-low) {
+    cursor: pointer;
+  }
+  .field-card:not(.is-overridden):not(.is-editing):not(.is-low):hover {
+    border-color: var(--grey-mid);
+    box-shadow: var(--shadow-sm);
+  }
+  .field-card.is-low .edit-hint { display: flex; }
+  .field-card:not(.is-overridden):not(.is-editing):not(.is-low):hover .edit-hint { display: flex; }
+  .edit-hint {
+    display: none;
+    align-items: center; gap: 4px;
+    font-size: 9px; font-weight: 600; color: var(--text-faint);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .field-card.is-low .edit-hint { color: var(--error); }
+  .edit-hint svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+  /* Confirm overlay for high-confidence override warning */
+  .confirm-overlay {
+    display: none; position: fixed; inset: 0; z-index: 10000;
+    background: rgba(15,27,40,.45); backdrop-filter: blur(2px);
+    align-items: center; justify-content: center;
+  }
+  .confirm-overlay.active { display: flex; }
+  .confirm-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: 32px 36px; max-width: 400px; width: 90%; text-align: center;
+    animation: fadeUp .2s ease both;
+  }
+  .confirm-card-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #FEF3C7; border: 1px solid #FDE68A;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+  }
+  .confirm-card-icon svg { width: 24px; height: 24px; stroke: var(--warn); fill: none; stroke-width: 2; }
+  .confirm-card h3 {
+    font-family: var(--serif); font-size: 17px; font-weight: 700;
+    color: var(--navy); margin-bottom: 8px;
+  }
+  .confirm-card p {
+    font-size: 13px; color: var(--text-soft); line-height: 1.6; margin-bottom: 6px;
+  }
+  .confirm-card .conf-highlight {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 2px 10px; border-radius: 99px;
+    background: #DCFCE7; color: var(--success); margin-bottom: 20px;
+  }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 4px; }
+  .confirm-proceed-btn {
+    flex: 1; padding: 10px; background: var(--navy); color: var(--white);
+    border: none; border-radius: var(--radius-sm); font-family: var(--sans);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: background var(--t);
+  }
+  .confirm-proceed-btn:hover { background: var(--steel); }
+  .confirm-cancel-btn {
+    flex: 1; padding: 10px; background: var(--white); color: var(--text-soft);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all var(--t);
+  }
+  .confirm-cancel-btn:hover { border-color: var(--grey-mid); color: var(--text-dark); }
+
+  /* Editing state */
+  .field-card.is-editing {
+    border-color: var(--steel-light) !important;
+    box-shadow: 0 0 0 3px rgba(45,95,138,.12) !important;
+    cursor: default;
+  }
+  .field-card.is-editing .field-val,
+  .field-card.is-editing .edit-hint { display: none; }
+  .field-card.is-editing .edit-input-row { display: flex; }
+
+  .edit-input-row {
+    display: none;
+    align-items: center; gap: 6px;
+    margin-top: 4px;
+  }
+  .edit-input {
+    flex: 1; font-family: var(--sans); font-size: 13px; font-weight: 500;
+    color: var(--text-dark); background: var(--bg);
+    border: 1px solid var(--steel-light); border-radius: var(--radius-sm);
+    padding: 4px 8px; outline: none;
+  }
+  .edit-input:focus { border-color: var(--steel); box-shadow: 0 0 0 2px rgba(45,95,138,.1); }
+  .edit-save-btn {
+    flex-shrink: 0; background: var(--navy); color: var(--white);
+    border: none; border-radius: var(--radius-sm); padding: 4px 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: background var(--t);
+  }
+  .edit-save-btn:hover { background: var(--steel); }
+  .edit-cancel-btn {
+    flex-shrink: 0; background: none; color: var(--text-faint);
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 8px;
+    font-size: 10px; font-weight: 600; cursor: pointer; transition: all var(--t);
+  }
+  .edit-cancel-btn:hover { color: var(--error); border-color: var(--error); }
+
+  /* User-overridden state */
+  .field-card.is-overridden {
+    border-color: #A5B4FC !important;
+    background: #EEF2FF !important;
+    cursor: default;
+  }
+  .field-card.is-overridden .field-val { color: var(--text-dark); }
+  .field-card.is-overridden .conf-row { display: none; }
+  .field-card.is-overridden .edit-hint { display: none; }
+  .override-badge {
+    display: none;
+    align-items: center; gap: 5px; margin-top: 7px;
+  }
+  .field-card.is-overridden .override-badge { display: flex; }
+  .override-badge-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px;
+    background: #C7D2FE; color: #3730A3;
+  }
+  .override-revert {
+    font-size: 9px; font-weight: 600; color: var(--text-faint);
+    background: none; border: none; cursor: pointer; padding: 0;
+    text-decoration: underline; text-underline-offset: 2px;
+    transition: color var(--t);
+  }
+  .override-revert:hover { color: var(--error); }
+
+  /* Line items table */
+  /* Confidence on total cards */
+  .total-conf {
+    display: flex; align-items: center; gap: 5px; margin-top: 8px;
+  }
+  .total-conf-bar {
+    flex: 1; height: 2px; background: rgba(255,255,255,.2); border-radius: 2px; overflow: hidden;
+  }
+  .total-conf-bar.light { background: var(--border-light); }
+  .total-conf-fill { height: 100%; border-radius: 2px; background: rgba(255,255,255,.7); }
+  .total-conf-fill.light.high   { background: var(--success); }
+  .total-conf-fill.light.medium { background: var(--warn); }
+  .total-conf-fill.light.low    { background: var(--error); }
+  .total-conf-pct {
+    font-size: 9px; font-weight: 700; flex-shrink: 0; color: rgba(255,255,255,.7);
+  }
+  .total-conf-pct.light.high   { color: var(--success); }
+  .total-conf-pct.light.medium { color: var(--warn); }
+  .total-conf-pct.light.low    { color: var(--error); }
+
+  .conf-col {
+    text-align: center; white-space: nowrap; width: 56px;
+  }
+  .conf-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.03em;
+    padding: 1px 6px; border-radius: var(--radius-sm);
+  }
+  .conf-badge.high   { color: var(--success); background: #DCFCE7; }
+  .conf-badge.medium { color: var(--warn);    background: #FEF3C7; }
+  .conf-badge.low    { color: var(--error);   background: #FEE2E2; }
+
+  /* ── Table row editing ── */
+  .data-table tbody tr { position: relative; }
+  .data-table tbody tr.row-editing td { background: #EFF6FF !important; }
+  .data-table tbody tr.row-editing td:first-child { border-left: 3px solid var(--steel-light); }
+  .data-table tbody tr.row-overridden td { background: #EEF2FF !important; }
+  .data-table tbody tr.row-overridden td:first-child { border-left: 3px solid #A5B4FC; }
+  .data-table tbody tr:not(.row-editing):not(.row-overridden) { cursor: pointer; }
+  .cell-display { display: block; }
+  .cell-input-wrap { display: none; }
+  tr.row-editing .cell-display  { display: none; }
+  tr.row-editing .cell-input-wrap { display: block; }
+  .cell-input {
+    width: 100%; font-family: var(--sans); font-size: 12px;
+    color: var(--text-dark); background: var(--white);
+    border: 1px solid var(--steel-light); border-radius: var(--radius-sm);
+    padding: 3px 6px; outline: none; min-width: 50px;
+  }
+  .cell-input:focus { border-color: var(--steel); box-shadow: 0 0 0 2px rgba(45,95,138,.1); }
+  .row-action-cell { padding: 6px 12px !important; }
+  .row-action-bar { display: flex; align-items: center; gap: 7px; }
+  .row-save-btn {
+    background: var(--navy); color: var(--white); border: none;
+    border-radius: var(--radius-sm); padding: 4px 14px;
+    font-family: var(--sans); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: background var(--t);
+  }
+  .row-save-btn:hover { background: var(--steel); }
+  .row-cancel-btn {
+    background: none; color: var(--text-faint); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 4px 10px;
+    font-size: 10px; font-weight: 600; cursor: pointer; transition: all var(--t);
+  }
+  .row-cancel-btn:hover { color: var(--error); border-color: var(--error); }
+  .row-revert-btn {
+    background: none; border: none; color: var(--text-faint);
+    font-size: 9px; font-weight: 600; text-decoration: underline;
+    text-underline-offset: 2px; cursor: pointer; padding: 0; margin-left: 4px;
+    transition: color var(--t);
+  }
+  .row-revert-btn:hover { color: var(--error); }
+  .row-overridden-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px; background: #C7D2FE; color: #3730A3;
+    margin-left: auto;
+  }
+  .row-edit-hint {
+    font-size: 9px; color: var(--text-faint); letter-spacing: 0.04em;
+    display: none; align-items: center; gap: 3px; margin-top: 1px;
+  }
+  tr:not(.row-editing):not(.row-overridden):hover .row-edit-hint { display: flex; }
+  .row-edit-hint svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+  /* ── Editable total cards ── */
+  .total-card { cursor: pointer; }
+  .total-card:not(.is-editing):not(.is-overridden):hover { border-color: var(--grey-mid); box-shadow: var(--shadow-sm); }
+  .total-card:not(.is-editing):not(.is-overridden):hover .total-edit-hint { display: flex; }
+  .total-edit-hint {
+    display: none; align-items: center; justify-content: center; gap: 4px;
+    font-size: 9px; font-weight: 600; color: var(--text-faint);
+    letter-spacing: 0.05em; text-transform: uppercase; margin-top: 5px;
+  }
+  .invoice-total:not(.is-editing):not(.is-overridden):hover .total-edit-hint { color: rgba(255,255,255,.6); }
+  .total-edit-hint svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+  .total-card.is-editing { border-color: var(--steel-light) !important; box-shadow: 0 0 0 3px rgba(45,95,138,.12) !important; cursor: default; }
+  .total-card.is-editing .total-val,
+  .total-card.is-editing .total-edit-hint,
+  .total-card.is-editing .total-conf { display: none; }
+  .total-card.is-editing .total-input-row { display: flex; }
+  .total-card.is-overridden { border-color: #A5B4FC !important; cursor: default; }
+  .total-card.is-overridden:not(.invoice-total) { background: #EEF2FF !important; }
+  .total-card.is-overridden .total-conf,
+  .total-card.is-overridden .total-edit-hint { display: none; }
+  .total-card.is-overridden .total-override-badge { display: flex; }
+  .total-input-row { display: none; flex-direction: column; gap: 5px; margin-top: 4px; }
+  .total-input {
+    width: 100%; font-family: var(--sans); font-size: 13px; font-weight: 600;
+    color: var(--text-dark); background: var(--bg);
+    border: 1px solid var(--steel-light); border-radius: var(--radius-sm);
+    padding: 5px 8px; outline: none; text-align: center;
+  }
+  .total-input:focus { border-color: var(--steel); box-shadow: 0 0 0 2px rgba(45,95,138,.1); }
+  .total-input-actions { display: flex; gap: 5px; }
+  .total-save-btn {
+    flex: 1; background: var(--navy); color: var(--white); border: none;
+    border-radius: var(--radius-sm); padding: 4px 0;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: background var(--t);
+  }
+  .total-save-btn:hover { background: var(--steel); }
+  .total-cancel-btn {
+    background: none; color: var(--text-faint); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 4px 8px;
+    font-size: 10px; cursor: pointer; transition: all var(--t);
+  }
+  .total-cancel-btn:hover { color: var(--error); border-color: var(--error); }
+  .total-override-badge {
+    display: none; align-items: center; justify-content: center; gap: 6px; margin-top: 6px;
+  }
+  .total-override-pill {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px; background: #C7D2FE; color: #3730A3;
+  }
+  .invoice-total .total-override-pill { background: rgba(255,255,255,.25); color: rgba(255,255,255,.9); }
+  .total-revert-btn {
+    font-size: 9px; font-weight: 600; color: var(--text-faint);
+    background: none; border: none; cursor: pointer; padding: 0;
+    text-decoration: underline; text-underline-offset: 2px; transition: color var(--t);
+  }
+  .invoice-total .total-revert-btn { color: rgba(255,255,255,.5); }
+  .total-revert-btn:hover { color: var(--error); }
+
+  .data-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; font-family: var(--sans);
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-xs);
+  }
+  .data-table th {
+    text-align: left; padding: 9px 12px;
+    background: var(--navy);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    color: var(--grey-light); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .data-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top; line-height: 1.4;
+    color: var(--text-mid);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:nth-child(even) td { background: var(--bg-panel); }
+  .data-table tr:hover td { background: #EFF6FF; }
+  .data-table td.num { text-align: right; }
+  .data-table td.amount-col { color: var(--navy); font-weight: 700; text-align: right; }
+  .data-table .line-num-col { color: var(--text-faint); text-align: center; width: 40px; }
+
+  /* Totals row */
+  .totals-grid {
+    display: grid; grid-template-columns: repeat(5,1fr); gap: 6px;
+  }
+  .total-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 12px; text-align: center;
+    box-shadow: var(--shadow-xs);
+  }
+  .total-card.invoice-total {
+    background: var(--navy);
+    border-color: var(--navy-deep);
+    box-shadow: var(--shadow-md);
+  }
+  .total-key { font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-faint); margin-bottom:7px; }
+  .total-card.invoice-total .total-key { color: rgba(255,255,255,.5); }
+  .total-val { font-family:var(--sans);font-weight:700;font-size:16px;color:var(--text-dark); }
+  .total-card.invoice-total .total-val { color:var(--white);font-size:20px; }
+
+  /* JSON raw toggle */
+  .raw-toggle {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px;
+  }
+  .toggle-btn {
+    background: var(--white); border: 1px solid var(--border);
+    color: var(--text-soft); font-family: var(--sans); font-size: 11px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    transition: all var(--t); box-shadow: var(--shadow-xs);
+  }
+  .toggle-btn:hover { color: var(--navy); border-color: var(--grey-mid); }
+  .toggle-btn.active {
+    background: var(--navy); border-color: var(--navy);
+    color: var(--white); box-shadow: var(--shadow-sm);
+  }
+  .download-btn {
+    margin-left: auto;
+    background: var(--white); border: 1px solid var(--border);
+    color: var(--text-soft); font-family: var(--sans); font-size: 11px;
+    font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+    transition: all var(--t); box-shadow: var(--shadow-xs);
+  }
+  .download-btn:hover { color: var(--navy); border-color: var(--grey-mid); box-shadow: var(--shadow-sm); }
+  .download-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+
+  .json-view {
+    display: none;
+    background: var(--navy-deep); border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--radius); padding: 24px;
+    font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.7;
+    color: var(--grey-light); overflow-x: auto;
+    white-space: pre; max-height: 600px; overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  .json-view.show { display: block; }
+
+  /* Confidence legend */
+  .conf-legend {
+    display: flex; gap: 16px; margin-bottom: 20px; padding: 10px 16px;
+    background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-xs);
+  }
+  .conf-item { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 500; color: var(--text-soft); }
+  .conf-dot { width:7px;height:7px;border-radius:50%; }
+
+  /* Error state */
+  .error-box {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius); padding: 18px 22px;
+    display: none; box-shadow: var(--shadow-xs);
+  }
+  .error-box.show { display: block; }
+  .error-title { font-family:var(--sans);font-weight:700;color:var(--error);margin-bottom:7px;font-size:14px; }
+  .error-msg   { font-size:12px;color:var(--text-mid);line-height:1.6; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width:6px;height:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border);border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--grey-mid); }
+
+  @media(max-width:900px) {
+    main, #view-schema { grid-template-columns: 1fr; height: auto; overflow: visible; }
+    .left-panel { border-right:none; border-bottom:1px solid var(--border); }
+    header { padding:0 16px; }
+    .engine-badges { display:none; }
+    .right-panel { padding:24px; }
+    .totals-grid { grid-template-columns:repeat(2,1fr); }
+  }
+
+  /* ── METRICS VIEW ── */
+  #view-metrics {
+    display: none;
+    height: calc(100vh - 56px - 42px);
+    overflow-y: auto;
+    padding: 32px 40px;
+    background: var(--bg);
+  }
+  #view-metrics::-webkit-scrollbar { width: 4px; }
+  #view-metrics::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  #view-metrics.active { display: block; }
+
+  .metrics-toolbar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 28px;
+  }
+  .metrics-updated {
+    font-size: 11px; color: var(--text-faint);
+    margin-left: auto;
+  }
+
+  .metrics-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .metrics-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 16px 14px; text-align: center;
+    box-shadow: var(--shadow-xs);
+  }
+  .metrics-card.accent { background: var(--navy); border-color: var(--navy-deep); }
+  .metrics-card-val {
+    font-family: var(--sans); font-weight: 700; font-size: 22px;
+    color: var(--navy); line-height: 1.1; margin-bottom: 6px;
+  }
+  .metrics-card.accent .metrics-card-val { color: var(--white); font-size: 26px; }
+  .metrics-card-lbl {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-faint);
+  }
+  .metrics-card.accent .metrics-card-lbl { color: rgba(255,255,255,.5); }
+
+  .metrics-engine-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 8px; margin-bottom: 32px;
+  }
+  .metrics-engine-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    box-shadow: var(--shadow-xs);
+  }
+  .metrics-engine-name {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-mid); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .metrics-engine-name .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-gemini { background: #F97316; }
+  .dot-grok   { background: #7C3AED; }
+  .metrics-engine-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; padding: 3px 0;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-soft);
+  }
+  .metrics-engine-row:last-child { border-bottom: none; }
+  .metrics-engine-row span:last-child { font-weight: 600; color: var(--text-dark); }
+
+  .metrics-log-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 11.5px; background: var(--white);
+    border-radius: var(--radius-sm); overflow: hidden;
+    box-shadow: var(--shadow-xs);
+  }
+  .metrics-log-table th {
+    text-align: left; padding: 8px 14px;
+    background: var(--navy); color: var(--grey-light);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .metrics-log-table td {
+    padding: 8px 14px; border-bottom: 1px solid var(--border-light);
+    color: var(--text-mid); vertical-align: middle;
+  }
+  .metrics-log-table tr:last-child td { border-bottom: none; }
+  .metrics-log-table tr:nth-child(even) td { background: var(--bg-panel); }
+  .metrics-log-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .op-pill {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px;
+  }
+  .op-pill.invoice   { background: #DBEAFE; color: var(--steel-light); }
+  .op-pill.induction { background: #FEF3C7; color: #92400E; }
+  .op-pill.reinforce { background: #EDE9FE; color: #5B21B6; }
+  .engine-pill {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px;
+  }
+  .engine-pill.gemini { background: #FFF7ED; color: #9A3412; }
+  .engine-pill.grok   { background: #F5F3FF; color: #5B21B6; }
+
+  @media(max-width:900px) {
+    .metrics-summary-grid { grid-template-columns: repeat(2,1fr); }
+  }
+
+  /* ── APP NAVIGATION TABS ── */
+  .app-tabs {
+    display: flex; align-items: stretch;
+    height: 42px; flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+    padding: 0 20px; gap: 2px;
+    position: relative; z-index: 5;
+  }
+  .app-tab {
+    display: flex; align-items: center; gap: 7px;
+    padding: 0 18px;
+    font-family: var(--sans); font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-faint);
+    border: none; background: none; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color var(--t), border-color var(--t);
+  }
+  .app-tab:hover { color: var(--text-mid); }
+  .app-tab.active { color: var(--navy); border-bottom-color: var(--steel-light); }
+  .app-tab svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+  /* adjust main height to account for tab strip */
+  main { height: calc(100vh - 56px - 42px); }
+
+  /* ── SCHEMA GENERATOR VIEW ── */
+  #view-schema {
+    display: none;
+    grid-template-columns: 380px 1fr;
+    height: calc(100vh - 56px - 42px);
+    overflow: hidden;
+  }
+  #view-schema.active { display: grid; }
+
+  /* multi-file list */
+  .sg-file-list { display: flex; flex-direction: column; gap: 5px; }
+  .sg-file-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 11px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-xs);
+    font-size: 12px;
+  }
+  .sg-file-row svg { width: 14px; height: 14px; stroke: var(--steel-light); fill: none; stroke-width: 1.75; flex-shrink: 0; }
+  .sg-file-name { flex: 1; font-weight: 500; color: var(--text-mid); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sg-file-size { font-size: 10px; color: var(--text-faint); flex-shrink: 0; }
+  .sg-file-remove {
+    background: none; border: none; cursor: pointer; color: var(--text-faint);
+    padding: 2px; display: flex; align-items: center; transition: color var(--t);
+  }
+  .sg-file-remove:hover { color: var(--error); }
+  .sg-file-remove svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* mode selector */
+  .sg-mode {
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .sg-mode-opt {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: border-color var(--t), background var(--t);
+  }
+  .sg-mode-opt:hover { border-color: var(--grey-mid); }
+  .sg-mode-opt.selected { border-color: var(--steel-light); background: #EFF6FF; }
+  .sg-mode-opt input[type=radio] { margin-top: 2px; accent-color: var(--steel-light); flex-shrink: 0; }
+  .sg-mode-label { font-size: 12px; font-weight: 600; color: var(--text-mid); }
+  .sg-mode-sub   { font-size: 10.5px; color: var(--text-faint); margin-top: 2px; line-height: 1.45; }
+
+  /* schema stage status */
+  .sg-stage-status { display: flex; flex-direction: column; gap: 6px; }
+
+  /* schema result table */
+  .sg-schema-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 12px; background: var(--white);
+    border-radius: var(--radius-sm); overflow: hidden;
+    box-shadow: var(--shadow-xs);
+  }
+  .sg-schema-table th {
+    text-align: left; padding: 9px 14px;
+    background: var(--navy); color: var(--grey-light);
+    font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sg-schema-table td {
+    padding: 9px 14px; border-bottom: 1px solid var(--border-light);
+    vertical-align: top; line-height: 1.5; color: var(--text-mid);
+  }
+  .sg-schema-table tr:last-child td { border-bottom: none; }
+  .sg-schema-table tr:nth-child(even) td { background: var(--bg-panel); }
+  .sg-schema-table tr:hover td { background: #EFF6FF; }
+  .sg-key-cell { font-weight: 700; color: var(--navy); white-space: nowrap; }
+  .sg-type-pill {
+    display: inline-block;
+    font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 99px;
+    background: var(--bg-mid); color: var(--text-soft);
+  }
+  .sg-type-pill.date     { background: #DBEAFE; color: var(--steel-light); }
+  .sg-type-pill.currency { background: #DCFCE7; color: #166534; }
+  .sg-type-pill.number   { background: #FEF3C7; color: #92400E; }
+  .sg-desc-cell { color: var(--text-soft); font-size: 11.5px; }
+
+  /* schema search bar */
+  .sg-search {
+    width: 100%; padding: 7px 12px;
+    font-family: var(--sans); font-size: 12px; color: var(--text-dark);
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); outline: none;
+    transition: border-color var(--t);
+  }
+  .sg-search:focus { border-color: var(--steel-light); box-shadow: 0 0 0 2px rgba(45,95,138,.1); }
+
+  /* schema result controls */
+  .sg-result-controls {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .sg-result-controls .toggle-btn { font-size: 10.5px; padding: 5px 12px; }
+  .sg-field-count {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 4px 10px; background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-xs);
+  }
+  .sg-field-count span { color: var(--navy); }
+
+  /* ── Auth screens ── */
+  #logout-screen {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg); align-items: center; justify-content: center;
+    flex-direction: column; gap: 0;
+  }
+  #logout-screen.active { display: flex; }
+  body.is-logout main, body.is-logout .engine-badges,
+  body.is-logout .app-tabs, body.is-logout #view-schema,
+  body.is-logout #view-metrics { display: none; }
+  body.is-logout header { border-bottom: 1px solid var(--border); }
+
+  .logout-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-xl); box-shadow: var(--shadow-lg);
+    padding: 52px 48px 44px; max-width: 440px; width: 100%;
+    text-align: center; position: relative; overflow: hidden;
+    animation: fadeUp .35s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .logout-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--steel-light), var(--steel));
+  }
+  .logout-badge {
+    width: 72px; height: 72px; border-radius: 18px;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px; box-shadow: var(--shadow-sm);
+  }
+  .logout-badge svg { width: 34px; height: 34px; color: var(--steel); }
+  .logout-card h1 {
+    font-family: var(--serif); font-size: 24px; font-weight: 700;
+    color: var(--navy); margin-bottom: 10px; letter-spacing: -0.01em;
+  }
+  .logout-card p {
+    font-size: 14px; color: var(--text-soft); line-height: 1.65;
+    max-width: 320px; margin: 0 auto;
+  }
+  .logout-divider { height: 1px; background: var(--border-light); margin: 24px 0 20px; }
+  .sign-in-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 11px 20px; background: var(--navy); color: var(--white);
+    font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+    border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none;
+    transition: background var(--t), box-shadow var(--t), transform var(--t);
+    box-shadow: var(--shadow-sm);
+  }
+  .sign-in-btn:hover { background: var(--navy-hover); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .sign-in-btn svg { width: 16px; height: 16px; opacity: 0.85; }
+  .logout-help { margin-top: 24px; font-size: 12px; color: var(--text-faint); }
+  .logout-footer {
+    margin-top: 28px; font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── User badge in header ── */
+  .user-badge {
+    display: none; align-items: center; gap: 8px;
+  }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--steel); color: var(--white);
+    font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .user-info { display: flex; flex-direction: column; line-height: 1.25; }
+  .user-name  { font-size: 12px; font-weight: 600; color: var(--text-mid); white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+  .user-email { font-size: 10px; color: var(--text-faint); white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+  .sign-out-link {
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--text-soft); text-decoration: none;
+    padding: 5px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius-sm); background: var(--white);
+    transition: all var(--t);
+  }
+  .sign-out-link:hover { color: var(--navy); border-color: var(--grey-mid); box-shadow: var(--shadow-xs); }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">
+    <div class="logo-wordmark">
+      <span class="logo-mark">TrifectAI</span>
+      <span class="logo-sub">Invoice Intelligence</span>
+    </div>
+  </a>
+  <div class="engine-badges" style="position:absolute;left:50%;transform:translateX(-50%);">
+    <span class="badge du">DOC UNDERSTANDING</span>
+    <span class="badge vis">VISION OCR</span>
+    <span class="badge gem">GEMINI 2.5 PRO</span>
+    <span class="badge grk">xAI GROK 4.3</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;margin-left:auto">
+    <div class="user-badge" id="user-badge">
+      <div class="user-avatar" id="user-avatar"></div>
+      <div class="user-info">
+        <span class="user-name"  id="user-name"></span>
+        <span class="user-email" id="user-email"></span>
+      </div>
+    </div>
+    <a class="sign-out-link" id="sign-out-link" href="/logout" style="display:none">Sign Out</a>
+  </div>
+</header>
+
+<!-- ══ APP NAV TABS ══ -->
+<nav class="app-tabs" id="appTabs">
+  <button class="app-tab active" id="tab-extract" onclick="switchView('extraction')">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+    Invoice Extraction
+  </button>
+  <button class="app-tab" id="tab-schema" onclick="switchView('schema')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Schema Generator
+  </button>
+  <button class="app-tab" id="tab-metrics" onclick="switchView('metrics')">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Metrics
+  </button>
+</nav>
+
+<!-- ══ SIGNED-OUT SCREEN ══ -->
+<div id="logout-screen">
+  <div class="logout-card">
+    <div class="logout-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <h1>You've been signed out</h1>
+    <p>Your session has ended securely. Sign back in anytime to continue.</p>
+    <div class="logout-divider"></div>
+    <a class="sign-in-btn" href="/login">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+      Sign In
+    </a>
+    <p class="logout-help">Powered by Oracle IDCS</p>
+    <div class="logout-footer">&copy; 2026 TrifectAI &nbsp;&middot;&nbsp; Invoice Intelligence</div>
+  </div>
+</div>
+
+<main id="view-extraction">
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+
+    <div>
+      <div class="panel-label">Upload Invoice</div>
+      <br>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        </div>
+        <div class="drop-title">Drop Invoice Here</div>
+        <div class="drop-sub">or click to browse</div>
+      </div>
+      <div class="file-selected" id="fileSelected">
+        <div class="file-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="file-name" id="fileName">—</div>
+        <div class="file-size" id="fileSize">—</div>
+        <button class="btn-clear" id="btnClear">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-analyze" id="btnAnalyze" disabled>
+      <span id="btnText">ANALYZE INVOICE</span>
+    </button>
+
+    <div>
+      <div class="panel-label">Engine Status</div>
+      <br>
+      <div class="engine-status">
+        <div class="engine-row" id="eng-du">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Doc Understanding</div>
+          <div class="engine-tag" id="tag-du">IDLE</div>
+        </div>
+        <div class="engine-row" id="eng-vis">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Vision OCR</div>
+          <div class="engine-tag" id="tag-vis">IDLE</div>
+        </div>
+        <div class="engine-row" id="eng-gem">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Gemini 2.5 Pro</div>
+          <div class="engine-tag" id="tag-gem">IDLE</div>
+        </div>
+        <div class="engine-row" id="eng-con">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Consensus Engine</div>
+          <div class="engine-tag" id="tag-con">IDLE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="extraction-stats" id="extractionStats">
+      <div class="stat-box">
+        <div class="stat-val" id="statLines">—</div>
+        <div class="stat-lbl">LINE ITEMS</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statFields">—</div>
+        <div class="stat-lbl">FIELDS</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statTime">—</div>
+        <div class="stat-lbl">SECONDS</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <section class="right-panel" id="rightPanel">
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-glyph">{ }</div>
+      <h2>No invoice loaded</h2>
+      <p>Upload a PDF or image invoice and TrifectAI will run it through three AI engines simultaneously, then reconcile the results into a single high-confidence extraction.</p>
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <div class="error-title">⚠ Extraction Failed</div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div class="results-wrap" id="resultsWrap">
+
+      <div class="raw-toggle">
+        <button class="toggle-btn active" id="btnFormatted" onclick="showView('formatted')">Formatted</button>
+        <button class="toggle-btn" id="btnRaw" onclick="showView('raw')">Raw JSON</button>
+        <button class="download-btn" id="btnDownload">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download JSON
+        </button>
+      </div>
+
+      <div class="conf-legend">
+        <div class="conf-item"><div class="conf-dot" style="background:var(--success)"></div>High (≥ 0.85)</div>
+        <div class="conf-item"><div class="conf-dot" style="background:var(--warn)"></div>Medium (0.70–0.84)</div>
+        <div class="conf-item"><div class="conf-dot" style="background:var(--error)"></div>Low (&lt; 0.70)</div>
+        <div class="conf-item" style="margin-left:auto">
+          <div class="conf-dot" style="background:var(--accent)"></div>Consensus bar = extraction confidence
+        </div>
+      </div>
+
+      <!-- Formatted view -->
+      <div id="formattedView">
+
+        <!-- Header -->
+        <div class="result-section" id="sec-header"></div>
+
+        <!-- Parties -->
+        <div class="result-section" id="sec-parties"></div>
+
+        <!-- Banking -->
+        <div class="result-section" id="sec-banking"></div>
+
+        <!-- Line Items -->
+        <div class="result-section" id="sec-lines"></div>
+
+        <!-- Tax Lines -->
+        <div class="result-section" id="sec-tax"></div>
+
+        <!-- Totals -->
+        <div class="result-section" id="sec-totals"></div>
+
+        <!-- Terms & Metadata -->
+        <div class="result-section" id="sec-terms"></div>
+
+      </div>
+
+      <!-- Raw JSON view -->
+      <pre class="json-view" id="rawView"></pre>
+
+    </div>
+
+  </section>
+</main>
+
+<!-- ══ SCHEMA GENERATOR VIEW ══ -->
+<div id="view-schema">
+
+  <!-- Left panel -->
+  <aside class="left-panel">
+
+    <div>
+      <div class="panel-label">Document Library</div><br>
+
+      <!-- Drop zone for adding PDFs -->
+      <div class="drop-zone" id="sg-dropZone" style="padding:28px 16px;">
+        <input type="file" id="sg-fileInput" accept=".pdf" multiple>
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        </div>
+        <div class="drop-title" style="font-size:13px;">Drop PDF(s) here</div>
+        <div class="drop-sub">Multiple files supported</div>
+      </div>
+
+      <div class="sg-file-list" id="sg-fileList" style="margin-top:10px;"></div>
+    </div>
+
+    <div>
+      <div class="panel-label">Pipeline Mode</div><br>
+      <div class="sg-mode" id="sg-modeGroup">
+        <label class="sg-mode-opt selected" id="sg-mode-full">
+          <input type="radio" name="sg-mode" value="full" checked>
+          <div>
+            <div class="sg-mode-label">Full Pipeline</div>
+            <div class="sg-mode-sub">Gemini induces schema → Grok reinforces &amp; validates → merged output</div>
+          </div>
+        </label>
+        <label class="sg-mode-opt" id="sg-mode-gemini">
+          <input type="radio" name="sg-mode" value="gemini_only">
+          <div>
+            <div class="sg-mode-label">Gemini Only</div>
+            <div class="sg-mode-sub">Faster — skips the Grok reinforcement pass</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-analyze" id="sg-btnGenerate" disabled>
+      <span id="sg-btnText">GENERATE SCHEMA</span>
+    </button>
+
+    <div>
+      <div class="panel-label">Stage Status</div><br>
+      <div class="sg-stage-status engine-status">
+        <div class="engine-row" id="sg-eng-ocr">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Vision OCR</div>
+          <div class="engine-tag" id="sg-tag-ocr">IDLE</div>
+        </div>
+        <div class="engine-row" id="sg-eng-gemini">
+          <div class="engine-dot"></div>
+          <div class="engine-name">Gemini Pro</div>
+          <div class="engine-tag" id="sg-tag-gemini">IDLE</div>
+        </div>
+        <div class="engine-row" id="sg-eng-grok">
+          <div class="engine-dot"></div>
+          <div class="engine-name">xAI Grok</div>
+          <div class="engine-tag" id="sg-tag-grok">IDLE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="extraction-stats" id="sg-stats">
+      <div class="stat-box">
+        <div class="stat-val" id="sg-statFields">—</div>
+        <div class="stat-lbl">FIELDS</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="sg-statFiles">—</div>
+        <div class="stat-lbl">PDFs</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="sg-statTime">—</div>
+        <div class="stat-lbl">SECONDS</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Right panel -->
+  <section class="right-panel" id="sg-rightPanel">
+
+    <div class="empty-state" id="sg-emptyState">
+      <div class="empty-glyph">{ }</div>
+      <h2>No schema generated</h2>
+      <p>Upload one or more PDF documents, choose a pipeline mode, and click Generate Schema. Gemini Pro will read the documents and produce a comprehensive labeling schema, optionally reinforced by xAI Grok.</p>
+    </div>
+
+    <div class="error-box" id="sg-errorBox">
+      <div class="error-title">⚠ Schema Generation Failed</div>
+      <div class="error-msg" id="sg-errorMsg"></div>
+    </div>
+
+    <div class="results-wrap" id="sg-resultsWrap">
+
+      <div class="sg-result-controls">
+        <button class="toggle-btn active" id="sg-btnTable" onclick="sgShowView('table')">Schema Table</button>
+        <button class="toggle-btn" id="sg-btnRaw" onclick="sgShowView('raw')">Raw JSON</button>
+        <div class="sg-field-count"><span id="sg-fieldCountVal">0</span> fields</div>
+        <button class="download-btn" id="sg-btnDownload" style="margin-left:auto;">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Schema
+        </button>
+      </div>
+
+      <div id="sg-tableView">
+        <input class="sg-search" id="sg-search" type="text" placeholder="Filter fields…" oninput="sgFilterTable(this.value)">
+        <br><br>
+        <div style="overflow-x:auto;">
+          <table class="sg-schema-table" id="sg-schemaTable">
+            <thead>
+              <tr>
+                <th style="width:32px;">#</th>
+                <th style="width:180px;">Key</th>
+                <th style="width:80px;">Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody id="sg-tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <pre class="json-view" id="sg-rawView"></pre>
+
+    </div>
+
+  </section>
+
+</div>
+
+<!-- ══ METRICS VIEW ══ -->
+<div id="view-metrics">
+
+  <div class="metrics-toolbar">
+    <button class="toggle-btn active" onclick="loadMetrics()">
+      <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;display:inline-block;vertical-align:middle;margin-right:5px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+    <button class="toggle-btn" onclick="clearMetrics()" style="color:var(--error);">Clear Session</button>
+    <span class="metrics-updated" id="metrics-updated"></span>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="panel-label" style="margin-bottom:12px;">Session Summary</div>
+  <div class="metrics-summary-grid" id="metrics-summary">
+    <div class="metrics-card accent">
+      <div class="metrics-card-val" id="m-calls">—</div>
+      <div class="metrics-card-lbl">API Calls</div>
+    </div>
+    <div class="metrics-card">
+      <div class="metrics-card-val" id="m-total">—</div>
+      <div class="metrics-card-lbl">Total Tokens</div>
+    </div>
+    <div class="metrics-card">
+      <div class="metrics-card-val" id="m-prompt">—</div>
+      <div class="metrics-card-lbl">Prompt Tokens</div>
+    </div>
+    <div class="metrics-card">
+      <div class="metrics-card-val" id="m-completion">—</div>
+      <div class="metrics-card-lbl">Completion Tokens</div>
+    </div>
+    <div class="metrics-card">
+      <div class="metrics-card-val" id="m-reasoning">—</div>
+      <div class="metrics-card-lbl">Reasoning Tokens</div>
+    </div>
+  </div>
+
+  <!-- By engine -->
+  <div class="panel-label" style="margin-bottom:12px;">By Engine</div>
+  <div class="metrics-engine-grid" id="metrics-engines"></div>
+
+  <!-- Call log -->
+  <div class="panel-label" style="margin-bottom:12px;">Call Log</div>
+  <div style="overflow-x:auto;">
+    <table class="metrics-log-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Engine</th>
+          <th>Operation</th>
+          <th class="num">Prompt</th>
+          <th class="num">Completion</th>
+          <th class="num">Reasoning</th>
+          <th class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody id="metrics-log-body">
+        <tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:28px;">No API calls recorded yet. Run an invoice extraction or schema generation.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+// ── Signed-out screen ────────────────────────────────────────────────
+(function() {
+  if (window.location.pathname === '/signed-out') {
+    document.body.classList.add('is-logout');
+    document.getElementById('logout-screen').classList.add('active');
+    document.title = 'Signed Out — TrifectAI';
+  }
+})();
+
+// ── Auth init: fetch /me on load ──────────────────────────────────────
+(function initAuth() {
+  if (document.body.classList.contains('is-logout')) return;
+  fetch('/me', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(me => {
+      if (!me) return; // not logged in — backend redirects on page load
+      const name     = me.display_name || '';
+      const email    = me.email || '';
+      const initials = name.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
+      const avatar   = document.getElementById('user-avatar');
+      if (avatar) avatar.textContent = initials;
+      const nameEl  = document.getElementById('user-name');
+      const emailEl = document.getElementById('user-email');
+      if (nameEl)  nameEl.textContent  = name;
+      if (emailEl) emailEl.textContent = email;
+      const badge   = document.getElementById('user-badge');
+      const signOut = document.getElementById('sign-out-link');
+      if (badge)   badge.style.display   = 'flex';
+      if (signOut) signOut.style.display = '';
+    });
+})();
+
+// ── State ──────────────────────────────────────────────────────────
+let selectedFile = null;
+let lastResult   = null;
+
+// ── File handling ──────────────────────────────────────────────────
+const dropZone   = document.getElementById('dropZone');
+const fileInput  = document.getElementById('fileInput');
+const fileSelected = document.getElementById('fileSelected');
+const btnAnalyze = document.getElementById('btnAnalyze');
+
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+function selectFile(file) {
+  const SUPPORTED_EXTS = ['.pdf','.jpg','.jpeg','.png','.tiff','.tif','.bmp','.webp'];
+  const fileExt = file.name.toLowerCase().match(/\.[^.]+$/)?.[0] || '';
+  if (!file || !SUPPORTED_EXTS.includes(fileExt)) {
+    alert('Please select a supported file (PDF, JPG, PNG, TIFF, BMP, or WEBP).'); return;
+  }
+  selectedFile = file;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileSize').textContent = formatBytes(file.size);
+  fileSelected.classList.add('show');
+  btnAnalyze.disabled = false;
+  resetEngines();
+}
+
+fileInput.addEventListener('change', e => selectFile(e.target.files[0]));
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  selectFile(e.dataTransfer.files[0]);
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  selectedFile = null; fileInput.value = '';
+  fileSelected.classList.remove('show');
+  btnAnalyze.disabled = true;
+  resetEngines();
+  hideResults();
+});
+
+// ── Engine status ──────────────────────────────────────────────────
+function setEngine(id, state, tag) {
+  const row = document.getElementById('eng-' + id);
+  const lbl = document.getElementById('tag-' + id);
+  row.className = 'engine-row ' + (state || '');
+  lbl.textContent = tag;
+}
+
+function resetEngines() {
+  ['du','vis','gem','con'].forEach(id => setEngine(id, '', 'IDLE'));
+  document.getElementById('extractionStats').classList.remove('show');
+}
+
+function setAllActive() {
+  setEngine('du',  'active', 'RUNNING');
+  setEngine('vis', 'active', 'RUNNING');
+  setEngine('gem', 'active', 'RUNNING');
+  setEngine('con', 'active', 'WAITING');
+}
+
+function setResultStatus(engines) {
+  const map = {
+    document_understanding: 'du',
+    vision: 'vis',
+    gemini: 'gem',
+  };
+  Object.entries(map).forEach(([key, id]) => {
+    const status = engines[key];
+    if (status === 'ok') setEngine(id, 'done', 'DONE');
+    else setEngine(id, 'error', 'ERROR');
+  });
+  setEngine('con', 'done', 'DONE');
+}
+
+// ── Results rendering ──────────────────────────────────────────────
+function confClass(c) {
+  if (c >= 0.85) return 'high';
+  if (c >= 0.70) return 'medium';
+  return 'low';
+}
+
+function fieldCard(key, val, conf, fullWidth) {
+  const isAmount = /total|subtotal|amount|price|tax|discount/i.test(key) && /[\d,]+\.\d{2}/.test(String(val));
+  const valClass = isAmount ? 'amount' : '';
+  const w = fullWidth ? ' full-width' : '';
+  const c = typeof conf === 'number' ? conf : null;
+  const isLow  = c !== null && c < 0.70;
+  const barW   = c !== null ? Math.round(c * 100) : null;
+  const cardId = 'fc-' + key.replace(/[^a-zA-Z0-9]/g, '_');
+
+  return `
+    <div class="field-card${w}${isLow ? ' is-low' : ''}" id="${cardId}"
+         data-conf="${c !== null ? c : ''}"
+         data-orig-val="${escHtml(String(val||''))}"
+         data-current-val="${escHtml(String(val||''))}"
+         onclick="handleCardClick('${cardId}')">
+      <div class="field-key">${key.replace(/_/g,' ')}</div>
+      <div class="field-val ${valClass}">${escHtml(String(val||'—'))}</div>
+      <div class="edit-hint">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Click to edit
+      </div>
+      ${c !== null ? `
+      <div class="conf-row">
+        <div class="conf-bar">
+          <div class="conf-fill ${confClass(c)}" style="width:${barW}%"></div>
+        </div>
+        <span class="conf-pct ${confClass(c)}">${barW}%</span>
+      </div>` : ''}
+      <div class="edit-input-row">
+        <input class="edit-input" type="text" value="${escHtml(String(val||''))}"
+               onclick="event.stopPropagation()"
+               onkeydown="if(event.key==='Enter')saveEdit('${cardId}');if(event.key==='Escape')cancelEdit('${cardId}')">
+        <button class="edit-save-btn"   onclick="event.stopPropagation();saveEdit('${cardId}')">Save</button>
+        <button class="edit-cancel-btn" onclick="event.stopPropagation();cancelEdit('${cardId}')">✕</button>
+      </div>
+      <div class="override-badge">
+        <span class="override-badge-pill">User Changed</span>
+        <button class="override-revert" onclick="event.stopPropagation();revertEdit('${cardId}')">Revert</button>
+      </div>
+    </div>`;
+}
+
+// ── Edit handlers ────────────────────────────────────────────────────
+let _pendingEditCardId = null;
+
+function handleCardClick(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card || card.classList.contains('is-editing') || card.classList.contains('is-overridden')) return;
+  const conf = card.dataset.conf !== '' ? parseFloat(card.dataset.conf) : null;
+  const isHigh = conf !== null && conf >= 0.70;
+  if (isHigh) {
+    // Show confirmation dialog
+    _pendingEditCardId = cardId;
+    const pct = Math.round(conf * 100);
+    const cls = conf >= 0.85 ? 'high' : 'medium';
+    const pctEl = document.getElementById('conf-override-pct');
+    if (pctEl) {
+      pctEl.textContent = pct + '% confidence';
+      pctEl.className = 'conf-highlight ' + cls;
+      // Restyle for medium
+      if (cls === 'medium') {
+        pctEl.style.background = '#FEF3C7'; pctEl.style.color = '#D97706';
+      } else {
+        pctEl.style.background = '#DCFCE7'; pctEl.style.color = 'var(--success)';
+      }
+    }
+    document.getElementById('conf-override-overlay').classList.add('active');
+  } else {
+    startEdit(cardId);
+  }
+}
+
+function startEdit(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card || card.classList.contains('is-editing') || card.classList.contains('is-overridden')) return;
+  card.classList.add('is-editing');
+  const input = card.querySelector('.edit-input');
+  if (input) { input.focus(); input.select(); }
+}
+
+function saveEdit(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const input = card.querySelector('.edit-input');
+  const valEl = card.querySelector('.field-val');
+  if (!input || !valEl) return;
+  const newVal = input.value.trim();
+  if (!newVal) return;
+  valEl.textContent = newVal;
+  card.classList.remove('is-editing', 'is-low');
+  card.classList.add('is-overridden');
+  card.dataset.currentVal = newVal;
+}
+
+function cancelEdit(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.classList.remove('is-editing');
+}
+
+function revertEdit(cardId) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  const valEl   = card.querySelector('.field-val');
+  const input   = card.querySelector('.edit-input');
+  const origVal = card.dataset.origVal || '';
+  if (valEl)  valEl.textContent = origVal || '—';
+  if (input)  input.value       = origVal;
+  const conf = card.dataset.conf !== '' ? parseFloat(card.dataset.conf) : null;
+  card.classList.remove('is-overridden', 'is-editing');
+  if (conf !== null && conf < 0.70) card.classList.add('is-low');
+  card.dataset.currentVal = origVal;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function sectionTitle(label, count) {
+  const cnt = count !== undefined ? `<span class="section-count">${count}</span>` : '';
+  return `<div class="section-title">${label}${cnt}</div>`;
+}
+
+function renderHeader(data, conf) {
+  const sec = document.getElementById('sec-header');
+  if (!Object.keys(data.header||{}).length) { sec.innerHTML=''; return; }
+  let html = sectionTitle('Invoice Header');
+  html += '<div class="field-grid">';
+  Object.entries(data.header).forEach(([k,v]) => {
+    const c = conf?.header?.[k];
+    html += fieldCard(k, v, c);
+  });
+  html += '</div>';
+  sec.innerHTML = html;
+}
+
+function renderParties(data, conf) {
+  const sec = document.getElementById('sec-parties');
+  const has = v => v && Object.keys(v).length > 0;
+  if (!has(data.bill_to) && !has(data.ship_to) && !has(data.remit_to)) { sec.innerHTML=''; return; }
+  // _confidence.parties stores flat keys: bill_to_address, ship_to_name, remit_to_name etc.
+  const pc = data._confidence?.parties || {};
+  let html = sectionTitle('Parties');
+  html += '<div class="field-grid">';
+  if (has(data.bill_to)) {
+    Object.entries(data.bill_to).forEach(([k,v]) => {
+      html += fieldCard('bill_to_'+k, v, pc['bill_to_'+k] ?? null);
+    });
+  }
+  if (has(data.ship_to)) {
+    Object.entries(data.ship_to).forEach(([k,v]) => {
+      html += fieldCard('ship_to_'+k, v, pc['ship_to_'+k] ?? null);
+    });
+  }
+  if (has(data.remit_to)) {
+    Object.entries(data.remit_to).forEach(([k,v]) => {
+      html += fieldCard('remit_to_'+k, v, pc[k] ?? pc['remit_to_'+k] ?? null);
+    });
+  }
+  html += '</div>';
+  sec.innerHTML = html;
+}
+
+function renderBanking(data) {
+  const sec = document.getElementById('sec-banking');
+  if (!data.banking || !Object.keys(data.banking).length) { sec.innerHTML=''; return; }
+  const bc = data._confidence?.banking || {};
+  let html = sectionTitle('Banking & Remittance');
+  html += '<div class="field-grid">';
+  Object.entries(data.banking).forEach(([k,v]) => html += fieldCard(k, v, bc[k] ?? null));
+  html += '</div>';
+  sec.innerHTML = html;
+}
+
+// ── Confidence badge for table column ─────────────────────────────
+function confBadge(pct) {
+  if (pct == null) return '—';
+  const cls = pct >= 85 ? 'high' : pct >= 70 ? 'medium' : 'low';
+  return `<span class="conf-badge ${cls}">${pct}%</span>`;
+}
+
+function editRowCell(cell, val) {
+  return `<td class="cell-editable">
+    <span class="cell-display">${escHtml(String(val||''))}</span>
+    <div class="cell-input-wrap"><input class="cell-input" type="text" value="${escHtml(String(val||''))}"></div>
+  </td>`;
+}
+
+function lineRowId(ri) { return 'line-row-' + ri; }
+function taxRowId(ri)  { return 'tax-row-'  + ri; }
+
+// Store original row data for revert
+const _origLineRows = [];
+const _origTaxRows  = [];
+
+function startRowEdit(rowId) {
+  const tr = document.getElementById(rowId);
+  if (!tr || tr.classList.contains('row-editing') || tr.classList.contains('row-overridden')) return;
+  tr.classList.add('row-editing');
+  const first = tr.querySelector('.cell-input');
+  if (first) { first.focus(); first.select(); }
+}
+
+function saveRowEdit(rowId) {
+  const tr = document.getElementById(rowId);
+  if (!tr) return;
+  tr.querySelectorAll('.cell-editable').forEach(td => {
+    const display = td.querySelector('.cell-display');
+    const input   = td.querySelector('.cell-input');
+    if (display && input) display.textContent = input.value.trim() || display.textContent;
+  });
+  tr.classList.remove('row-editing');
+  tr.classList.add('row-overridden');
+  // update badge in action cell
+  const pill = tr.querySelector('.row-overridden-pill');
+  if (pill) pill.style.display = 'inline-block';
+}
+
+function cancelRowEdit(rowId) {
+  const tr = document.getElementById(rowId);
+  if (tr) tr.classList.remove('row-editing');
+}
+
+function revertRowEdit(rowId, orig) {
+  const tr = document.getElementById(rowId);
+  if (!tr) return;
+  const fields = Object.values(orig);
+  tr.querySelectorAll('.cell-editable').forEach((td, i) => {
+    const display = td.querySelector('.cell-display');
+    const input   = td.querySelector('.cell-input');
+    const v = fields[i] !== undefined ? String(fields[i]) : '';
+    if (display) display.textContent = v;
+    if (input)   input.value = v;
+  });
+  tr.classList.remove('row-overridden', 'row-editing');
+}
+
+function renderLineItems(data, conf) {
+  const sec = document.getElementById('sec-lines');
+  const items = data.line_items || [];
+  if (!items.length) { sec.innerHTML=''; return; }
+  _origLineRows.length = 0;
+  let html = sectionTitle('Line Items', items.length);
+  html += `<table class="data-table">
+    <thead><tr>
+      <th>#</th><th>Description</th><th>UOM</th>
+      <th>Qty</th><th>Unit Price</th><th>Discount</th><th>Amount</th><th class="conf-col">Conf</th>
+    </tr></thead><tbody>`;
+  items.forEach((row, ri) => {
+    const rc = conf?.line_items?.[ri] || {};
+    const cp = k => rc[k] != null ? Math.round(rc[k]*100) : null;
+    const rowPct = cp('amount') ?? cp('description');
+    _origLineRows.push({...row});
+    const rid = lineRowId(ri);
+    html += `<tr id="${rid}" onclick="startRowEdit('${rid}')">
+      <td class="line-num-col">
+        <span class="cell-display">${escHtml(String(row.line_number||ri+1))}</span>
+        <div class="cell-input-wrap" style="display:none">
+          <input class="cell-input" type="text" value="${escHtml(String(row.line_number||ri+1))}" style="width:36px">
+        </div>
+        <div class="row-edit-hint"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      </td>
+      ${editRowCell(null, row.description)}
+      ${editRowCell(null, row.uom)}
+      ${editRowCell(null, row.quantity)}
+      ${editRowCell(null, row.unit_price)}
+      ${editRowCell(null, row.discount_pct||'0%')}
+      <td class="cell-editable amount-col">
+        <span class="cell-display">${escHtml(String(row.amount||''))}</span>
+        <div class="cell-input-wrap"><input class="cell-input" type="text" value="${escHtml(String(row.amount||''))}"></div>
+      </td>
+      <td class="conf-col" onclick="event.stopPropagation()">
+        ${confBadge(rowPct)}
+        <div class="row-overridden-pill" style="display:none">Edited</div>
+      </td>
+    </tr>
+    <tr id="${rid}-actions" class="row-actions-row" style="display:none">
+      <td colspan="8" class="row-action-cell">
+        <div class="row-action-bar">
+          <button class="row-save-btn"   onclick="saveRowEdit('${rid}');document.getElementById('${rid}-actions').style.display='none'">Save Row</button>
+          <button class="row-cancel-btn" onclick="cancelRowEdit('${rid}');document.getElementById('${rid}-actions').style.display='none'">Cancel</button>
+          <button class="row-revert-btn" onclick="revertRowEdit('${rid}',_origLineRows[${ri}]);document.getElementById('${rid}-actions').style.display='none'">Revert to AI</button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  sec.innerHTML = html;
+  // wire up row clicks to show action bar
+  items.forEach((_, ri) => {
+    const rid = lineRowId(ri);
+    const tr  = document.getElementById(rid);
+    const actRow = document.getElementById(rid + '-actions');
+    if (tr && actRow) {
+      tr.addEventListener('click', () => {
+        if (!tr.classList.contains('row-overridden')) actRow.style.display = '';
+      });
+    }
+  });
+}
+
+function renderTaxLines(data) {
+  const sec = document.getElementById('sec-tax');
+  const rows = data.tax_lines || [];
+  if (!rows.length) { sec.innerHTML=''; return; }
+  _origTaxRows.length = 0;
+  let html = sectionTitle('Tax Details', rows.length);
+  html += `<table class="data-table">
+    <thead><tr>
+      <th>Regime</th><th>Tax Name</th><th>Rate Code</th>
+      <th>Taxable Amount</th><th>Rate</th><th>Tax Amount</th><th class="conf-col">Conf</th>
+    </tr></thead><tbody>`;
+  rows.forEach((row, ri) => {
+    const rc = (data._confidence?.tax_lines || [])[ri] || {};
+    const cp = k => rc[k] != null ? Math.round(rc[k]*100) : null;
+    const rowPct = cp('tax_amount') ?? cp('regime');
+    _origTaxRows.push({...row});
+    const rid = taxRowId(ri);
+    html += `<tr id="${rid}" onclick="startRowEdit('${rid}')">
+      <td class="cell-editable">
+        <span class="cell-display">${escHtml(String(row.regime||''))}</span>
+        <div class="cell-input-wrap"><input class="cell-input" type="text" value="${escHtml(String(row.regime||''))}"></div>
+        <div class="row-edit-hint"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+      </td>
+      ${editRowCell(null, row.name)}
+      ${editRowCell(null, row.rate_code)}
+      ${editRowCell(null, row.taxable_amount)}
+      ${editRowCell(null, row.rate_pct)}
+      <td class="cell-editable amount-col">
+        <span class="cell-display">${escHtml(String(row.tax_amount||''))}</span>
+        <div class="cell-input-wrap"><input class="cell-input" type="text" value="${escHtml(String(row.tax_amount||''))}"></div>
+      </td>
+      <td class="conf-col" onclick="event.stopPropagation()">
+        ${confBadge(rowPct)}
+        <div class="row-overridden-pill" style="display:none">Edited</div>
+      </td>
+    </tr>
+    <tr id="${rid}-actions" class="row-actions-row" style="display:none">
+      <td colspan="7" class="row-action-cell">
+        <div class="row-action-bar">
+          <button class="row-save-btn"   onclick="saveRowEdit('${rid}');document.getElementById('${rid}-actions').style.display='none'">Save Row</button>
+          <button class="row-cancel-btn" onclick="cancelRowEdit('${rid}');document.getElementById('${rid}-actions').style.display='none'">Cancel</button>
+          <button class="row-revert-btn" onclick="revertRowEdit('${rid}',_origTaxRows[${ri}]);document.getElementById('${rid}-actions').style.display='none'">Revert to AI</button>
+        </div>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  sec.innerHTML = html;
+  rows.forEach((_, ri) => {
+    const rid = taxRowId(ri);
+    const tr  = document.getElementById(rid);
+    const actRow = document.getElementById(rid + '-actions');
+    if (tr && actRow) {
+      tr.addEventListener('click', () => {
+        if (!tr.classList.contains('row-overridden')) actRow.style.display = '';
+      });
+    }
+  });
+}
+
+function totalCardId(k) { return 'total-card-' + k; }
+
+function startTotalEdit(k) {
+  const card = document.getElementById(totalCardId(k));
+  if (!card || card.classList.contains('is-editing') || card.classList.contains('is-overridden')) return;
+  card.classList.add('is-editing');
+  const inp = card.querySelector('.total-input');
+  if (inp) { inp.focus(); inp.select(); }
+}
+
+function saveTotalEdit(k) {
+  const card = document.getElementById(totalCardId(k));
+  if (!card) return;
+  const inp = card.querySelector('.total-input');
+  const val = card.querySelector('.total-val');
+  if (!inp || !val) return;
+  const nv = inp.value.trim();
+  if (!nv) return;
+  val.textContent = nv;
+  card.classList.remove('is-editing');
+  card.classList.add('is-overridden');
+}
+
+function cancelTotalEdit(k) {
+  const card = document.getElementById(totalCardId(k));
+  if (card) card.classList.remove('is-editing');
+}
+
+function revertTotalEdit(k, origVal) {
+  const card = document.getElementById(totalCardId(k));
+  if (!card) return;
+  const val = card.querySelector('.total-val');
+  const inp = card.querySelector('.total-input');
+  if (val) val.textContent = origVal;
+  if (inp) inp.value = origVal;
+  card.classList.remove('is-overridden', 'is-editing');
+}
+
+function renderTotals(data) {
+  const sec = document.getElementById('sec-totals');
+  const tot = data.totals || {};
+  const confTot = data._confidence?.totals || {};
+  if (!Object.keys(tot).length) { sec.innerHTML=''; return; }
+  const order = ['subtotal','discount_total','taxable_amount','total_tax','invoice_total'];
+  let html = sectionTitle('Totals');
+  html += '<div class="totals-grid">';
+  order.forEach(k => {
+    if (!tot[k]) return;
+    const isInv = k === 'invoice_total';
+    const cls   = isInv ? ' invoice-total' : '';
+    const light = isInv ? '' : ' light';
+    const pct   = confTot[k] != null ? Math.round(confTot[k]*100) : null;
+    const confCls = pct >= 85 ? 'high' : pct >= 70 ? 'medium' : 'low';
+    const confHtml = pct != null ? `
+      <div class="total-conf">
+        <div class="total-conf-bar${light}"><div class="total-conf-fill${light} ${confCls}" style="width:${pct}%"></div></div>
+        <span class="total-conf-pct${light} ${confCls}">${pct}%</span>
+      </div>` : '';
+    const cid   = totalCardId(k);
+    const origVal = escHtml(String(tot[k]));
+    html += `<div class="total-card${cls}" id="${cid}" onclick="startTotalEdit('${k}')">
+      <div class="total-key">${k.replace(/_/g,' ').toUpperCase()}</div>
+      <div class="total-val">${origVal}</div>
+      ${confHtml}
+      <div class="total-edit-hint">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </div>
+      <div class="total-input-row">
+        <input class="total-input" type="text" value="${origVal}"
+               onclick="event.stopPropagation()"
+               onkeydown="if(event.key==='Enter'){event.stopPropagation();saveTotalEdit('${k}')}if(event.key==='Escape'){event.stopPropagation();cancelTotalEdit('${k}')}">
+        <div class="total-input-actions">
+          <button class="total-save-btn"   onclick="event.stopPropagation();saveTotalEdit('${k}')">Save</button>
+          <button class="total-cancel-btn" onclick="event.stopPropagation();cancelTotalEdit('${k}')">✕</button>
+        </div>
+      </div>
+      <div class="total-override-badge">
+        <span class="total-override-pill">Edited</span>
+        <button class="total-revert-btn" onclick="event.stopPropagation();revertTotalEdit('${k}','${origVal}')">Revert</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  sec.innerHTML = html;
+}
+
+function renderTerms(data) {
+  const sec = document.getElementById('sec-terms');
+  const all = {...(data.terms||{}), ...(data.metadata||{})};
+  if (!Object.keys(all).length) { sec.innerHTML=''; return; }
+  // Merge both confidence buckets — metadata keys now have their own entry
+  const tc = {
+    ...(data._confidence?.terms    || {}),
+    ...(data._confidence?.metadata || {}),
+  };
+  let html = sectionTitle('Terms & Metadata');
+  html += '<div class="field-grid">';
+  Object.entries(all).forEach(([k,v]) => html += fieldCard(k, v, tc[k] ?? null));
+  html += '</div>';
+  sec.innerHTML = html;
+}
+
+function renderResults(result) {
+  const conf = result._confidence || {};
+  renderHeader(result, conf);
+  renderParties(result, conf);
+  renderBanking(result);
+  renderLineItems(result, conf);
+  renderTaxLines(result);
+  renderTotals(result);
+  renderTerms(result);
+
+  // Stats
+  const lines   = (result.line_items||[]).length;
+  const fields  = Object.keys(result.header||{}).length + Object.keys(result.banking||{}).length;
+  const elapsed = result._extraction_meta?.elapsed_sec || '—';
+  document.getElementById('statLines').textContent = lines;
+  document.getElementById('statFields').textContent = fields;
+  document.getElementById('statTime').textContent   = elapsed;
+  document.getElementById('extractionStats').classList.add('show');
+
+  // Engine status
+  setResultStatus(result._extraction_meta?.engines || {});
+
+  // Raw JSON
+  document.getElementById('rawView').textContent = JSON.stringify(result, null, 2);
+
+  // Show results
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('resultsWrap').classList.add('show');
+
+  lastResult = result;
+}
+
+function hideResults() {
+  document.getElementById('resultsWrap').classList.remove('show');
+  document.getElementById('emptyState').style.display = '';
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('extractionStats').classList.remove('show');
+}
+
+function showView(which) {
+  document.getElementById('formattedView').style.display = which==='formatted' ? '' : 'none';
+  document.getElementById('rawView').classList.toggle('show', which==='raw');
+  document.getElementById('btnFormatted').classList.toggle('active', which==='formatted');
+  document.getElementById('btnRaw').classList.toggle('active', which==='raw');
+}
+
+// ── Download (captures live edits from tables and totals) ──────────
+document.getElementById('btnDownload').addEventListener('click', () => {
+  if (!lastResult) return;
+  const out = JSON.parse(JSON.stringify(lastResult));
+
+  // Capture edited line items
+  (out.line_items || []).forEach((row, ri) => {
+    const tr = document.getElementById(lineRowId(ri));
+    if (!tr) return;
+    const cols = ['line_number','description','uom','quantity','unit_price','discount_pct','amount'];
+    const displays = tr.querySelectorAll('.cell-display');
+    displays.forEach((el, ci) => { if (cols[ci]) row[cols[ci]] = el.textContent; });
+  });
+
+  // Capture edited tax lines
+  (out.tax_lines || []).forEach((row, ri) => {
+    const tr = document.getElementById(taxRowId(ri));
+    if (!tr) return;
+    const cols = ['regime','name','rate_code','taxable_amount','rate_pct','tax_amount'];
+    const displays = tr.querySelectorAll('.cell-display');
+    displays.forEach((el, ci) => { if (cols[ci]) row[cols[ci]] = el.textContent; });
+  });
+
+  // Capture edited totals
+  ['subtotal','discount_total','taxable_amount','total_tax','invoice_total'].forEach(k => {
+    const card = document.getElementById(totalCardId(k));
+    if (!card) return;
+    const val = card.querySelector('.total-val');
+    if (val && out.totals) out.totals[k] = val.textContent;
+  });
+
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (lastResult._extraction_meta?.source_file || 'invoice').replace('.pdf','') + '_trifectai.json';
+  a.click();
+});
+
+// ── View switching (tabs) ──────────────────────────────────────────
+function switchView(view) {
+  document.getElementById('view-extraction').style.display = view === 'extraction' ? '' : 'none';
+  document.getElementById('view-schema').classList.toggle('active',  view === 'schema');
+  document.getElementById('view-metrics').classList.toggle('active', view === 'metrics');
+  document.getElementById('tab-extract').classList.toggle('active',  view === 'extraction');
+  document.getElementById('tab-schema').classList.toggle('active',   view === 'schema');
+  document.getElementById('tab-metrics').classList.toggle('active',  view === 'metrics');
+  if (view === 'metrics') loadMetrics();
+}
+
+// ── Metrics ────────────────────────────────────────────────────────
+function fmtNum(n) { return (n || 0).toLocaleString(); }
+
+function opPill(op) {
+  const map = {
+    invoice_extraction:   ['invoice',   'Invoice Extraction'],
+    schema_induction:     ['induction', 'Schema Induction'],
+    schema_reinforcement: ['reinforce', 'Schema Reinforcement'],
+  };
+  const [cls, label] = map[op] || ['invoice', op];
+  return `<span class="op-pill ${cls}">${label}</span>`;
+}
+
+function enginePill(eng) {
+  const label = eng === 'grok' ? 'xAI Grok' : 'Gemini';
+  return `<span class="engine-pill ${eng}">${label}</span>`;
+}
+
+function engineCard(eng, data) {
+  const dotClass = eng === 'grok' ? 'dot-grok' : 'dot-gemini';
+  const label    = eng === 'grok' ? 'xAI Grok 4.3' : 'Gemini 2.5 Pro';
+  return `
+    <div class="metrics-engine-card">
+      <div class="metrics-engine-name">
+        <span class="dot ${dotClass}"></span>${label}
+      </div>
+      <div class="metrics-engine-row"><span>Calls</span><span>${fmtNum(data.calls)}</span></div>
+      <div class="metrics-engine-row"><span>Prompt Tokens</span><span>${fmtNum(data.prompt)}</span></div>
+      <div class="metrics-engine-row"><span>Completion Tokens</span><span>${fmtNum(data.completion)}</span></div>
+      ${data.reasoning ? `<div class="metrics-engine-row"><span>Reasoning Tokens</span><span>${fmtNum(data.reasoning)}</span></div>` : ''}
+      <div class="metrics-engine-row"><span>Total Tokens</span><span>${fmtNum(data.total)}</span></div>
+    </div>`;
+}
+
+async function loadMetrics() {
+  try {
+    const resp = await fetch('/metrics', { cache: 'no-store' });
+    if (!resp.ok) return;
+    const data = await resp.json();
+    renderMetrics(data);
+  } catch(e) { /* silently ignore if not logged in */ }
+}
+
+function renderMetrics(data) {
+  const t = data.totals || {};
+  document.getElementById('m-calls').textContent      = fmtNum(data.call_count);
+  document.getElementById('m-total').textContent      = fmtNum(t.total);
+  document.getElementById('m-prompt').textContent     = fmtNum(t.prompt);
+  document.getElementById('m-completion').textContent = fmtNum(t.completion);
+  document.getElementById('m-reasoning').textContent  = fmtNum(t.reasoning);
+
+  // Engine cards
+  const engDiv = document.getElementById('metrics-engines');
+  const engines = data.by_engine || {};
+  if (Object.keys(engines).length === 0) {
+    engDiv.innerHTML = '<p style="color:var(--text-faint);font-size:12px;">No calls recorded yet.</p>';
+  } else {
+    engDiv.innerHTML = Object.entries(engines)
+      .sort(([a],[b]) => a.localeCompare(b))
+      .map(([eng, d]) => engineCard(eng, d)).join('');
+  }
+
+  // Call log
+  const tbody = document.getElementById('metrics-log-body');
+  const rows = data.log || [];
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-faint);padding:28px;">No API calls recorded yet. Run an invoice extraction or schema generation.</td></tr>';
+  } else {
+    tbody.innerHTML = rows.map(r => `
+      <tr>
+        <td style="white-space:nowrap;color:var(--text-faint);">${(r.ts||'').replace('T',' ').replace('Z','')}</td>
+        <td>${enginePill(r.engine)}</td>
+        <td>${opPill(r.operation)}</td>
+        <td class="num">${fmtNum(r.prompt)}</td>
+        <td class="num">${fmtNum(r.completion)}</td>
+        <td class="num">${r.reasoning ? fmtNum(r.reasoning) : '<span style="color:var(--text-faint)">—</span>'}</td>
+        <td class="num" style="font-weight:700;color:var(--navy);">${fmtNum(r.total)}</td>
+      </tr>`).join('');
+  }
+
+  document.getElementById('metrics-updated').textContent =
+    'Updated ' + new Date().toLocaleTimeString();
+}
+
+async function clearMetrics() {
+  await fetch('/metrics/reset', { method: 'POST' });
+  loadMetrics();
+}
+
+// ── Schema Generator ──────────────────────────────────────────────
+let sgFiles    = [];   // {file, name, size}
+let sgSchema   = [];   // last result
+
+const sgDropZone  = document.getElementById('sg-dropZone');
+const sgFileInput = document.getElementById('sg-fileInput');
+const sgBtnGen    = document.getElementById('sg-btnGenerate');
+
+function sgFormatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+function sgRefreshFileList() {
+  const list = document.getElementById('sg-fileList');
+  list.innerHTML = sgFiles.map((f, i) => `
+    <div class="sg-file-row">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="sg-file-name">${escHtml(f.name)}</span>
+      <span class="sg-file-size">${sgFormatBytes(f.size)}</span>
+      <button class="sg-file-remove" onclick="sgRemoveFile(${i})" title="Remove">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+  sgBtnGen.disabled = sgFiles.length === 0;
+}
+
+function sgAddFiles(fileList) {
+  for (const f of fileList) {
+    if (!f.name.toLowerCase().endsWith('.pdf')) continue;
+    if (sgFiles.find(x => x.name === f.name)) continue;
+    sgFiles.push({ file: f, name: f.name, size: f.size });
+  }
+  sgRefreshFileList();
+}
+
+function sgRemoveFile(i) {
+  sgFiles.splice(i, 1);
+  sgRefreshFileList();
+}
+
+sgFileInput.addEventListener('change', e => { sgAddFiles(e.target.files); sgFileInput.value = ''; });
+sgDropZone.addEventListener('dragover', e => { e.preventDefault(); sgDropZone.classList.add('drag-over'); });
+sgDropZone.addEventListener('dragleave', () => sgDropZone.classList.remove('drag-over'));
+sgDropZone.addEventListener('drop', e => {
+  e.preventDefault(); sgDropZone.classList.remove('drag-over');
+  sgAddFiles(e.dataTransfer.files);
+});
+
+// mode radio styling
+document.querySelectorAll('#sg-modeGroup input[type=radio]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('.sg-mode-opt').forEach(el => el.classList.remove('selected'));
+    radio.closest('.sg-mode-opt').classList.add('selected');
+  });
+});
+
+function sgSetStage(id, state, tag) {
+  const row = document.getElementById('sg-eng-' + id);
+  const lbl = document.getElementById('sg-tag-' + id);
+  if (!row || !lbl) return;
+  row.className = 'engine-row ' + (state || '');
+  lbl.textContent = tag;
+}
+
+function sgResetStages() {
+  ['ocr','gemini','grok'].forEach(id => sgSetStage(id, '', 'IDLE'));
+  document.getElementById('sg-stats').classList.remove('show');
+}
+
+function sgSetAllRunning(mode) {
+  sgSetStage('ocr',    'active', 'RUNNING');
+  sgSetStage('gemini', 'active', 'RUNNING');
+  sgSetStage('grok',   mode === 'full' ? 'active' : '', mode === 'full' ? 'WAITING' : 'SKIP');
+}
+
+function sgApplyStages(stages) {
+  const stateFor = s => s === 'ok' ? 'done' : s === 'pending' ? '' : s === 'skipped' ? '' : 'error';
+  const tagFor   = s => s === 'ok' ? 'DONE' : s === 'pending' ? 'IDLE' : s === 'skipped' ? 'SKIP' : 'ERROR';
+  ['ocr','gemini','grok'].forEach(id => {
+    const v = stages[id] || '';
+    sgSetStage(id, stateFor(v), tagFor(v));
+  });
+}
+
+function sgShowView(which) {
+  document.getElementById('sg-tableView').style.display = which === 'table' ? '' : 'none';
+  document.getElementById('sg-rawView').classList.toggle('show', which === 'raw');
+  document.getElementById('sg-btnTable').classList.toggle('active', which === 'table');
+  document.getElementById('sg-btnRaw').classList.toggle('active', which === 'raw');
+}
+
+function sgRenderTable(schema) {
+  const tbody = document.getElementById('sg-tableBody');
+  tbody.innerHTML = schema.map((e, i) => `
+    <tr data-key="${escHtml(e.key.toLowerCase())}">
+      <td style="color:var(--text-faint);text-align:center;">${i + 1}</td>
+      <td class="sg-key-cell">${escHtml(e.key)}</td>
+      <td><span class="sg-type-pill ${e.dataType}">${escHtml(e.dataType)}</span></td>
+      <td class="sg-desc-cell">${escHtml(e.description)}</td>
+    </tr>`).join('');
+}
+
+function sgFilterTable(q) {
+  const term = q.toLowerCase().trim();
+  document.querySelectorAll('#sg-tableBody tr').forEach(tr => {
+    tr.style.display = !term || tr.dataset.key.includes(term) ? '' : 'none';
+  });
+}
+
+function sgRenderResults(data) {
+  sgSchema = data.schema || [];
+  const meta = data.meta || {};
+
+  sgApplyStages(meta.stages || {});
+
+  document.getElementById('sg-statFields').textContent = sgSchema.length;
+  document.getElementById('sg-statFiles').textContent  = (meta.files || []).length;
+  document.getElementById('sg-statTime').textContent   = meta.elapsed_sec || '—';
+  document.getElementById('sg-stats').classList.add('show');
+
+  document.getElementById('sg-fieldCountVal').textContent = sgSchema.length;
+  sgRenderTable(sgSchema);
+  document.getElementById('sg-rawView').textContent = JSON.stringify(sgSchema, null, 2);
+
+  document.getElementById('sg-emptyState').style.display  = 'none';
+  document.getElementById('sg-errorBox').classList.remove('show');
+  document.getElementById('sg-resultsWrap').classList.add('show');
+  sgShowView('table');
+}
+
+document.getElementById('sg-btnDownload').addEventListener('click', () => {
+  if (!sgSchema.length) return;
+  const blob = new Blob([JSON.stringify(sgSchema, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'generated_schema.json';
+  a.click();
+});
+
+sgBtnGen.addEventListener('click', async () => {
+  if (!sgFiles.length) return;
+
+  const mode = document.querySelector('#sg-modeGroup input[name="sg-mode"]:checked')?.value || 'full';
+
+  sgBtnGen.disabled = true;
+  sgBtnGen.classList.add('loading');
+  document.getElementById('sg-btnText').textContent = '⟳  GENERATING…';
+  sgResetStages();
+  sgSetAllRunning(mode);
+
+  document.getElementById('sg-emptyState').style.display = 'none';
+  document.getElementById('sg-errorBox').classList.remove('show');
+  document.getElementById('sg-resultsWrap').classList.remove('show');
+
+  const fd = new FormData();
+  sgFiles.forEach(f => fd.append('files', f.file));
+  fd.append('mode', mode);
+
+  try {
+    const resp = await fetch('/generate-schema', { method: 'POST', body: fd });
+    const data = await resp.json();
+    if (!resp.ok || data.error) {
+      if (data.stages) sgApplyStages(data.stages);
+      document.getElementById('sg-errorMsg').textContent = data.error || `HTTP ${resp.status}`;
+      document.getElementById('sg-errorBox').classList.add('show');
+      document.getElementById('sg-emptyState').style.display = 'none';
+    } else {
+      sgRenderResults(data);
+    }
+  } catch (err) {
+    document.getElementById('sg-errorMsg').textContent = `Network error: ${err.message}`;
+    document.getElementById('sg-errorBox').classList.add('show');
+    sgResetStages();
+  } finally {
+    sgBtnGen.disabled = false;
+    sgBtnGen.classList.remove('loading');
+    document.getElementById('sg-btnText').textContent = 'GENERATE SCHEMA';
+    sgBtnGen.disabled = sgFiles.length === 0;
+  }
+});
+
+// ── Analyze ────────────────────────────────────────────────────────
+btnAnalyze.addEventListener('click', async () => {
+  if (!selectedFile) return;
+
+  btnAnalyze.disabled = true;
+  btnAnalyze.classList.add('loading');
+  document.getElementById('btnText').textContent = '⟳  RUNNING ENGINES…';
+  setAllActive();
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('resultsWrap').classList.remove('show');
+
+  const fd = new FormData();
+  fd.append('file', selectedFile);
+
+  try {
+    const resp = await fetch('/extract', { method:'POST', body:fd });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      document.getElementById('errorMsg').textContent = data.error || `HTTP ${resp.status}`;
+      document.getElementById('errorBox').classList.add('show');
+      document.getElementById('emptyState').style.display = 'none';
+      resetEngines();
+    } else {
+      renderResults(data);
+    }
+  } catch(err) {
+    document.getElementById('errorMsg').textContent = `Network error: ${err.message}`;
+    document.getElementById('errorBox').classList.add('show');
+    resetEngines();
+  } finally {
+    btnAnalyze.disabled = false;
+    btnAnalyze.classList.remove('loading');
+    document.getElementById('btnText').textContent = 'ANALYZE INVOICE';
+  }
+});
+</script>
+<!-- ══ HIGH-CONFIDENCE OVERRIDE CONFIRM ══ -->
+<div class="confirm-overlay" id="conf-override-overlay">
+  <div class="confirm-card">
+    <div class="confirm-card-icon">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </div>
+    <h3>Override High-Confidence Value?</h3>
+    <p>This field was extracted with:</p>
+    <span class="conf-highlight" id="conf-override-pct"></span>
+    <p>Are you sure you want to manually override it?</p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel-btn"  id="conf-override-cancel">Keep Original</button>
+      <button class="confirm-proceed-btn" id="conf-override-proceed">Yes, Edit It</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Overlay listeners — in a separate script block so the overlay DOM exists
+document.getElementById('conf-override-proceed').addEventListener('click', function() {
+  document.getElementById('conf-override-overlay').classList.remove('active');
+  if (_pendingEditCardId) { startEdit(_pendingEditCardId); _pendingEditCardId = null; }
+});
+document.getElementById('conf-override-cancel').addEventListener('click', function() {
+  document.getElementById('conf-override-overlay').classList.remove('active');
+  _pendingEditCardId = null;
+});
+document.getElementById('conf-override-overlay').addEventListener('click', function(e) {
+  if (e.target === this) {
+    this.classList.remove('active');
+    _pendingEditCardId = null;
+  }
+});
+</script>
+</body>
+</html>

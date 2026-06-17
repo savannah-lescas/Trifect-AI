@@ -1,0 +1,5 @@
+flask>=3.0.0
+flask-cors>=4.0.0
+oci>=2.120.0
+pdf2image>=1.17.0
+Pillow>=10.0.0

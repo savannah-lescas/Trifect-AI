@@ -1,0 +1,233 @@
+[
+  {
+    "key": "InvoiceNumber",
+    "dataType": "string",
+    "description": "Unique alphanumeric invoice identifier assigned by Oracle Fusion Receivables. Labeled 'Invoice Number' in the Invoice Details panel in the upper-right area of the document, directly below the title 'TAX INVOICE'. Format example: INV-2026-00483. Do not extract PO Number, Wire Reference, or any other reference codes."
+  },
+  {
+    "key": "InvoiceDate",
+    "dataType": "date",
+    "description": "Date the invoice was issued. Labeled 'Invoice Date' in the Invoice Details section, upper-right area. Format is DD-Mon-YYYY, for example 05-May-2026. Do not extract Due Date, Printed Date, or any other date fields."
+  },
+  {
+    "key": "DueDate",
+    "dataType": "date",
+    "description": "Payment due date by which the invoice must be settled. Labeled 'Due Date' in the Invoice Details panel, upper-right section, typically displayed in red bold to signal urgency. Format is DD-Mon-YYYY, for example 04-Jun-2026. Do not extract Invoice Date or Printed Date."
+  },
+  {
+    "key": "PaymentTerms",
+    "dataType": "string",
+    "description": "Payment terms agreed between buyer and seller. Labeled 'Payment Terms' in the Invoice Details panel and also referenced in the Notes & Payment Terms section. Common values: Net 30, Net 60, Due on Receipt. Extract only the term code, for example 'Net 30'."
+  },
+  {
+    "key": "Currency",
+    "dataType": "string",
+    "description": "Currency code and full name for this invoice. Labeled 'Currency' in the Invoice Details panel, upper-right area. Format is ISO currency code followed by full name, for example 'USD – US Dollar'."
+  },
+  {
+    "key": "BusinessUnit",
+    "dataType": "string",
+    "description": "Oracle Fusion business unit responsible for the transaction. Labeled 'Business Unit' in the Invoice Details panel. Typically a short name such as 'US Primary BU'."
+  },
+  {
+    "key": "TransactionType",
+    "dataType": "string",
+    "description": "Type of Receivables transaction as defined in Oracle Fusion. Labeled 'Transaction Type' in the Invoice Details panel. Common values: Standard Invoice, Credit Memo, Debit Memo."
+  },
+  {
+    "key": "PurchaseOrderNumber",
+    "dataType": "string",
+    "description": "Buyer's purchase order reference number linked to this invoice. Labeled 'PO Number' in the Invoice Details panel. Format example: PO-2026-10293. Do not extract the Invoice Number."
+  },
+  {
+    "key": "Salesperson",
+    "dataType": "string",
+    "description": "Name of the salesperson or account manager associated with this invoice. Labeled 'Salesperson' in the Invoice Details panel. Extract the full name as printed."
+  },
+
+  {
+    "key": "BillToName",
+    "dataType": "string",
+    "description": "Legal name of the customer being billed. Located in the Bill-To block in the upper-left section, directly under the 'BILL-TO' label. This is the first bold line in the block. Do not extract Ship-To or Remit-To name."
+  },
+  {
+    "key": "BillToAddress",
+    "dataType": "string",
+    "description": "Full mailing address of the bill-to customer. Located in the Bill-To block, upper-left section, on the lines immediately following the customer name. May span multiple consecutive lines (street, suite, city, state, ZIP, country). Extract all adjacent address lines as a single concatenated value."
+  },
+  {
+    "key": "BillToTaxRegistrationNumber",
+    "dataType": "string",
+    "description": "Tax registration or VAT number of the bill-to customer. Located inside the Bill-To address block, labeled 'Tax Reg #'. Format example: US-987654321."
+  },
+  {
+    "key": "ShipToName",
+    "dataType": "string",
+    "description": "Name of the ship-to location or entity. Located in the Ship-To block (middle panel of the upper section), directly under the 'SHIP-TO' label. This is the first bold line. Do not extract Bill-To or Remit-To names."
+  },
+  {
+    "key": "ShipToAddress",
+    "dataType": "string",
+    "description": "Full delivery address of the ship-to location. Located in the Ship-To block, on the lines following the ship-to name. May include building, street, city, state, ZIP, country, and an attention line. Extract all adjacent address lines as a single concatenated value."
+  },
+
+  {
+    "key": "RemitToName",
+    "dataType": "string",
+    "description": "Legal name of the entity to which payment should be remitted. Located in the Remittance Information section, labeled 'Remit-To Name'. Distinct from the supplier brand name in the document header — extract the value adjacent to the Remit-To Name label."
+  },
+  {
+    "key": "RemitToAddress",
+    "dataType": "string",
+    "description": "Mailing address where payment should be sent. Located in the Remittance Information section, labeled 'Remit-To Address'. Extract the full address as a single value."
+  },
+  {
+    "key": "BankName",
+    "dataType": "string",
+    "description": "Name of the bank for wire transfer or ACH payment. Located in the Remittance Information section, labeled 'Bank Name', for example 'Wells Fargo Bank N.A.'."
+  },
+  {
+    "key": "BankAccountNumber",
+    "dataType": "string",
+    "description": "Bank account number for payment. Located in the Remittance Information section, labeled 'Account Number'. May be partially masked, for example 'XXXX-XXXX-4872'."
+  },
+  {
+    "key": "BankRoutingNumber",
+    "dataType": "string",
+    "description": "ABA routing number for ACH or wire transfers. Located in the Remittance Information section, labeled 'ABA / Routing'. Nine-digit numeric value."
+  },
+  {
+    "key": "SWIFTCode",
+    "dataType": "string",
+    "description": "SWIFT/BIC code for international wire payments. Located in the Remittance Information section, labeled 'SWIFT Code'. Format is 8–11 alphanumeric characters."
+  },
+  {
+    "key": "WireReference",
+    "dataType": "string",
+    "description": "Reference string to include with wire transfer payments to ensure correct application. Located in the Remittance Information section, labeled 'Wire Reference'. Typically combines the invoice number and customer name."
+  },
+
+  {
+    "key": "LineNumber",
+    "dataType": "string",
+    "description": "Sequential line number for each row in the Line Items table. This field repeats once per line item — extract the value from the first column ('#') of EVERY row in the table under the 'LINE ITEMS' section header. Return as a list preserving table order, for example ['1','2','3','4','5']. Do not extract rows from the Tax Details table."
+  },
+  {
+    "key": "LineItemDescription",
+    "dataType": "string",
+    "description": "Item or service description for each line in the Line Items table. This field repeats once per line item — extract the value from the second column ('Item / Description') of EVERY row, including any product code or sub-detail printed on a second line within the same cell. Return as a list of strings preserving table order, with the same length and ordering as LineNumber. Do not include the column header text."
+  },
+  {
+    "key": "LineItemUOM",
+    "dataType": "string",
+    "description": "Unit of measure for each line in the Line Items table. This field repeats once per line item — extract the value from the third column ('UOM') of EVERY row. Common values include EA, USR, CONN, ANN, HR, BOX. Return as a list preserving table order, with the same length and ordering as LineNumber."
+  },
+  {
+    "key": "LineItemQuantity",
+    "dataType": "number",
+    "description": "Quantity for each line in the Line Items table. This field repeats once per line item — extract the value from the fourth column ('Qty') of EVERY row. Return as a list of numeric values preserving table order, with the same length and ordering as LineNumber. Do not extract values from the Tax Details table."
+  },
+  {
+    "key": "LineItemUnitPrice",
+    "dataType": "currency",
+    "description": "Unit price (per UOM) for each line in the Line Items table. This field repeats once per line item — extract the value from the fifth column ('Unit Price (USD)') of EVERY row. Return as a list of currency amounts preserving table order, with the same length and ordering as LineNumber. Do not extract the line Amount, Subtotal, or any tax amount."
+  },
+  {
+    "key": "LineItemDiscountPercent",
+    "dataType": "string",
+    "description": "Discount percentage applied at the line level for each row in the Line Items table. This field repeats once per line item — extract the value from the sixth column ('Discount') of EVERY row, including the percent sign, for example '10.00%'. Return as a list preserving table order, with the same length and ordering as LineNumber. Do not extract Tax Rate % from the Tax Details table."
+  },
+  {
+    "key": "LineItemAmount",
+    "dataType": "currency",
+    "description": "Net line amount (quantity × unit price minus line discount, excluding tax) for each row in the Line Items table. This field repeats once per line item — extract the value from the seventh and final column ('Amount (USD)') of EVERY row. Return as a list of currency amounts preserving table order, with the same length and ordering as LineNumber. Do not extract Subtotal, Tax Amount, or Total Amount Due from the summary section."
+  },
+
+  {
+    "key": "TaxRegime",
+    "dataType": "string",
+    "description": "Tax regime for each tax line in the Tax Details table. This field repeats once per tax row — extract the value from the first column ('Tax Regime') of EVERY row in the Tax Details table. Return as a list preserving order, for example ['US Sales Tax','US Sales Tax']. Do not include the column header."
+  },
+  {
+    "key": "TaxName",
+    "dataType": "string",
+    "description": "Specific tax name or jurisdiction for each tax line. This field repeats once per tax row — extract the value from the second column ('Tax Name') of EVERY row in the Tax Details table. Return as a list preserving order with the same length as TaxRegime."
+  },
+  {
+    "key": "TaxRateCode",
+    "dataType": "string",
+    "description": "Oracle Fusion tax rate code for each tax line. This field repeats once per tax row — extract the value from the third column ('Tax Rate Code') of EVERY row in the Tax Details table. Return as a list preserving order with the same length as TaxRegime."
+  },
+  {
+    "key": "TaxLineTaxableAmount",
+    "dataType": "currency",
+    "description": "Taxable amount upon which the tax for each tax line is calculated. This field repeats once per tax row — extract the value from the fourth column ('Taxable Amount (USD)') of EVERY row in the Tax Details table. Return as a list of currency amounts preserving order with the same length as TaxRegime. Do not confuse with the TaxableAmount field in the totals summary."
+  },
+  {
+    "key": "TaxLineRate",
+    "dataType": "string",
+    "description": "Tax rate percentage for each tax line. This field repeats once per tax row — extract the value from the fifth column ('Tax Rate %') of EVERY row in the Tax Details table, including the percent sign, for example '9.25%'. Return as a list preserving order with the same length as TaxRegime. Do not extract LineItemDiscountPercent."
+  },
+  {
+    "key": "TaxLineAmount",
+    "dataType": "currency",
+    "description": "Tax amount calculated for each tax line. This field repeats once per tax row — extract the value from the sixth and final column ('Tax Amount (USD)') of EVERY row in the Tax Details table. Return as a list of currency amounts preserving order with the same length as TaxRegime. Do not extract the aggregate TotalTaxAmount from the totals summary."
+  },
+
+  {
+    "key": "SubTotal",
+    "dataType": "currency",
+    "description": "Sum of all line item amounts before tax and after line-level discounts. Labeled 'Subtotal' in the totals section at the bottom-right of the invoice. Format is USD followed by the numeric amount, for example 'USD 126,615.00'. Do not extract individual line amounts, tax amounts, or the total amount due."
+  },
+  {
+    "key": "DiscountTotal",
+    "dataType": "currency",
+    "description": "Total discount amount aggregated across all line items. Labeled 'Discount Total' in the totals section, below Subtotal. Do not confuse with per-line discount percentages in the Line Items table."
+  },
+  {
+    "key": "TaxableAmount",
+    "dataType": "currency",
+    "description": "Aggregate amount upon which taxes are calculated for the entire invoice. Labeled 'Taxable Amount' in the totals summary section. This is the invoice-level total; do not extract per-line taxable amounts (those are TaxLineTaxableAmount)."
+  },
+  {
+    "key": "TotalTaxAmount",
+    "dataType": "currency",
+    "description": "Total tax charged on the invoice, aggregating all tax regimes and jurisdictions. Labeled 'Tax Amount' in the totals summary section. This is the invoice-level total; do not extract per-line tax amounts (those are TaxLineAmount)."
+  },
+  {
+    "key": "InvoiceTotal",
+    "dataType": "currency",
+    "description": "Grand total amount due from the customer, including all line items, discounts, and taxes. Labeled 'TOTAL AMOUNT DUE' in the summary section at the bottom-right, displayed in bold red text. This is the definitive payable amount, for example 'USD 138,643.43'. Do not extract SubTotal, TaxableAmount, or TotalTaxAmount."
+  },
+
+  {
+    "key": "LatePaymentFee",
+    "dataType": "string",
+    "description": "Late payment penalty or interest rate applied to overdue balances. Located in the Notes & Payment Terms section, labeled 'Late Fee'. Typically a percentage per period, for example '1.5% per month on overdue balances'."
+  },
+  {
+    "key": "DisputeContactEmail",
+    "dataType": "string",
+    "description": "Email address to contact for billing disputes or invoice queries. Located in the Notes & Payment Terms section, labeled 'Dispute Process'. Extract only the email address (the substring matching the email pattern), not the surrounding instructional text."
+  },
+  {
+    "key": "InvoiceStatus",
+    "dataType": "string",
+    "description": "Current status of the invoice as reported by Oracle Fusion Receivables. Located in the Notes & Payment Terms section, labeled 'Invoice Status'. Common values: OPEN, CLOSED, PARTIAL, CANCELLED."
+  },
+  {
+    "key": "PrintedDate",
+    "dataType": "date",
+    "description": "Date and time the invoice document was generated or printed. Located in the footer at the very bottom of the page, following the label 'Printed:'. Includes both date and time, for example '05-May-2026 09:14 AM PST'. Do not extract Invoice Date or Due Date."
+  },
+  {
+    "key": "TransactionSource",
+    "dataType": "string",
+    "description": "Oracle Fusion Receivables transaction source indicating how the invoice was created. Located in the document footer, following 'Transaction Source:'. Common values: Manual, AutoInvoice, Imported."
+  },
+  {
+    "key": "AuthorizedBy",
+    "dataType": "string",
+    "description": "Name or role of the person who authorized the invoice. Located in the footer, following 'Authorized by:'. For example 'AR Manager'. Do not extract the salesperson name."
+  }
+]

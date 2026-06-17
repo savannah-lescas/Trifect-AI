@@ -1,0 +1,242 @@
+[
+  {
+    "dataType": "string",
+    "description": "Labeled 'TAX INVOICE'. Located in the top-right header of the document. Format: e.g. TAX INVOICE. Do not extract 'Transaction Type'.",
+    "key": "InvoiceType"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Invoice Number:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: XXX-YYYY-NNNNN, e.g. INV-2026-00483. Do not extract the PO Number.",
+    "key": "InvoiceNumber"
+  },
+  {
+    "dataType": "date",
+    "description": "Labeled 'Invoice Date:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: DD-Mon-YYYY, e.g. 05-May-2026. Do not extract the Due Date.",
+    "key": "InvoiceDate"
+  },
+  {
+    "dataType": "date",
+    "description": "Labeled 'Due Date:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: DD-Mon-YYYY, e.g. 04-Jun-2026. Do not extract the Invoice Date.",
+    "key": "DueDate"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Payment Terms:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: e.g. Net 30. Do not extract the 'Notes & Payment Terms' section text.",
+    "key": "PaymentTerms"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Currency:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: XXX - Xxxxxx, e.g. USD - US Dollar.",
+    "key": "Currency"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Business Unit:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: e.g. US Primary BU.",
+    "key": "BusinessUnit"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Transaction Type:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: e.g. Standard Invoice. Do not extract the main 'TAX INVOICE' title.",
+    "key": "TransactionType"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'PO Number:'. Located in the upper-right 'INVOICE DETAILS' panel. Format: PO-YYYY-NNNNN, e.g. PO-2026-10293. Do not extract the Invoice Number.",
+    "key": "PurchaseOrderNumber"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Salesperson:'. Located at the bottom of the 'INVOICE DETAILS' panel. Format: e.g. Jordan Mitchell.",
+    "key": "Salesperson"
+  },
+  {
+    "dataType": "string",
+    "description": "The first line under the 'BILL-TO' heading. Located in the upper-left of the page. Format: e.g. Acme Corporation. Do not extract the Ship-To Name.",
+    "key": "BillToName"
+  },
+  {
+    "dataType": "string",
+    "description": "The full address block under the 'BILL-TO' heading. Located in the upper-left of the page. Format: Multi-line address, e.g. Suite 400, 1200 Market Street\\nSan Francisco, CA 94102\\nUnited States. Do not extract the Ship-To Address or Remit-To Address.",
+    "key": "BillToAddress"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Tax Reg #:'. Located in the 'BILL-TO' block. Format: XX-NNNNNNNNN, e.g. US-987654321.",
+    "key": "BillToTaxRegistrationNumber"
+  },
+  {
+    "dataType": "string",
+    "description": "The first line under the 'SHIP-TO' heading. Located in the upper-middle of the page. Format: e.g. Acme Corporation - West Campus. Do not extract the Bill-To Name.",
+    "key": "ShipToName"
+  },
+  {
+    "dataType": "string",
+    "description": "The full address block under the 'SHIP-TO' heading. Located in the upper-middle of the page. Format: Multi-line address, e.g. Building C, 850 Innovation Drive\\nPalo Alto, CA 94304\\nUnited States. Do not extract the Bill-To Address or Remit-To Address.",
+    "key": "ShipToAddress"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Attn:'. Located at the bottom of the 'SHIP-TO' block. Format: e.g. Attn: Procurement Department.",
+    "key": "ShipToAttention"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Remit-To Name:'. Located in the 'REMITTANCE INFORMATION' section. Format: e.g. Oracle Financial Services LLC.",
+    "key": "RemitToName"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Remit-To Address:'. Located in the 'REMITTANCE INFORMATION' section. Format: Multi-line address, e.g. 500 Oracle Parkway, Redwood City, CA\\n94065. Do not extract Bill-To or Ship-To addresses.",
+    "key": "RemitToAddress"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Bank Name:'. Located in the 'REMITTANCE INFORMATION' section. Format: e.g. Wells Fargo Bank N.A.",
+    "key": "BankName"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Account Number:'. Located in the 'REMITTANCE INFORMATION' section. Format: XXXX-XXXX-NNNN, e.g. XXXX-XXXX-4872.",
+    "key": "BankAccountNumber"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'ABA / Routing:'. Located in the 'REMITTANCE INFORMATION' section. Format: NNNNNNNNN, e.g. 121000248.",
+    "key": "BankRoutingNumber"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'SWIFT Code:'. Located in the 'REMITTANCE INFORMATION' section. Format: XXXXXXXX, e.g. WFBIUS6S.",
+    "key": "SWIFTCode"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Wire Reference:'. Located in the 'REMITTANCE INFORMATION' section. Format: e.g. INV-2026-00483 / Acme Corp.",
+    "key": "WireReference"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Contact:'. Located in the 'REMITTANCE INFORMATION' section. Format: email | phone, e.g. ar-collections@oracle.com | +1 650 506 7000.",
+    "key": "RemittanceContact"
+  },
+  {
+    "dataType": "number",
+    "description": "The '#' column in the 'LINE ITEMS' table. Located in the center of the page. Format: N, e.g. 1. This is the anchor key for the line items table.",
+    "key": "LineNumber"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Item / Description' column in the 'LINE ITEMS' table. Located in the center of the page. Format: Multi-line text, e.g. Oracle Fusion ERP - Enterprise Cloud License Product Code: ORA-ERP-ENT-2026 | Period: Jan-Dec 2026. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemDescription"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'UOM' column in the 'LINE ITEMS' table. Located in the center of the page. Format: e.g. EA. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemUOM"
+  },
+  {
+    "dataType": "number",
+    "description": "The 'Qty' column in the 'LINE ITEMS' table. Located in the center of the page. Format: N, e.g. 5. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemQuantity"
+  },
+  {
+    "dataType": "currency",
+    "description": "The 'Unit Price (USD)' column in the 'LINE ITEMS' table. Located in the center of the page. Format: USD 12,500.00, e.g. USD 12,500.00. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemUnitPrice"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Discount' column in the 'LINE ITEMS' table. Located in the center of the page. Format: N.NN%, e.g. 10.00%. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemDiscountPercent"
+  },
+  {
+    "dataType": "currency",
+    "description": "The 'Amount (USD)' column in the 'LINE ITEMS' table. Located in the center of the page. Format: USD 62,500.00, e.g. USD 62,500.00. Return as a list preserving table order, with the same length and ordering as LineNumber.",
+    "key": "LineItemAmount"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Tax Regime' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: e.g. US Sales Tax. This is the anchor key for the tax details table.",
+    "key": "TaxRegime"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Tax Name' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: e.g. CA State Tax. Return as a list preserving table order, with the same length and ordering as TaxRegime.",
+    "key": "TaxName"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Tax Rate Code' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: e.g. CA-STATE-9.25. Return as a list preserving table order, with the same length and ordering as TaxRegime.",
+    "key": "TaxRateCode"
+  },
+  {
+    "dataType": "currency",
+    "description": "The 'Taxable Amount (USD)' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: USD 126,615.00, e.g. USD 126,615.00. Return as a list preserving table order, with the same length and ordering as TaxRegime.",
+    "key": "TaxLineTaxableAmount"
+  },
+  {
+    "dataType": "string",
+    "description": "The 'Tax Rate %' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: N.NN%, e.g. 9.25%. Return as a list preserving table order, with the same length and ordering as TaxRegime.",
+    "key": "TaxLineRate"
+  },
+  {
+    "dataType": "currency",
+    "description": "The 'Tax Amount (USD)' column in the 'TAX DETAILS' table on page 2. Located in the upper-middle of page 2. Format: USD 11,711.89, e.g. USD 11,711.89. Return as a list preserving table order, with the same length and ordering as TaxRegime.",
+    "key": "TaxLineAmount"
+  },
+  {
+    "dataType": "currency",
+    "description": "Labeled 'Subtotal:'. Located in the totals summary block on page 2, below the 'TAX DETAILS' table. Format: USD 126,615.00, e.g. USD 126,615.00. Do not confuse with Taxable Amount or Invoice Total.",
+    "key": "SubTotal"
+  },
+  {
+    "dataType": "currency",
+    "description": "Labeled 'Discount Total:'. Located in the totals summary block on page 2. Format: USD 2,885.00, e.g. USD 2,885.00.",
+    "key": "DiscountTotal"
+  },
+  {
+    "dataType": "currency",
+    "description": "Labeled 'Taxable Amount:'. Located in the totals summary block on page 2. Format: USD 126,615.00, e.g. USD 126,615.00. Do not confuse with SubTotal or Invoice Total.",
+    "key": "TaxableAmount"
+  },
+  {
+    "dataType": "currency",
+    "description": "Labeled 'Tax Amount:'. Located in the totals summary block on page 2. Format: USD 12,028.43, e.g. USD 12,028.43.",
+    "key": "TotalTaxAmount"
+  },
+  {
+    "dataType": "currency",
+    "description": "Labeled 'TOTAL AMOUNT DUE:'. Located in the totals summary block on page 2. Format: USD 138,643.43, e.g. USD 138,643.43.",
+    "key": "InvoiceTotal"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Late Fee:'. Located in the 'NOTES & PAYMENT TERMS' section on page 2. Format: e.g. 1.5% per month on overdue balances.",
+    "key": "LatePaymentFee"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Invoice Status:'. Located in the 'NOTES & PAYMENT TERMS' section on page 2. Format: e.g. OPEN.",
+    "key": "InvoiceStatus"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Dispute Process:'. Located in the 'NOTES & PAYMENT TERMS' section on page 2. Extract the email address. Format: e.g. ar-disputes@oracle.com.",
+    "key": "DisputeContactEmail"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Printed:'. Located in the page footer on page 2. Format: DD-Mon-YYYY HH:MM AM/PM TTT, e.g. 05-May-2026 09:14 AM PST.",
+    "key": "PrintedDate"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Transaction Source:'. Located in the page footer on page 2. Format: e.g. Manual.",
+    "key": "TransactionSource"
+  },
+  {
+    "dataType": "string",
+    "description": "Labeled 'Authorized by:'. Located in the page footer on page 2. Format: e.g. AR Manager.",
+    "key": "AuthorizedBy"
+  }
+]
