@@ -1185,6 +1185,20 @@
       </div>
     </div>
 
+    <div style="margin-bottom:12px;">
+      <div class="panel-label" style="margin-bottom:6px;">CUSTOMER / INVOICE SOURCE</div>
+      <select id="customerSelect" style="
+        width:100%; padding:10px 12px; border-radius:8px;
+        border:1px solid var(--border); background:var(--surface);
+        color:var(--text); font-size:13px; cursor:pointer;">
+        <option value="">— Select customer —</option>
+      </select>
+      <div id="customerWarning" style="display:none; margin-top:5px;
+        font-size:11px; color:#f59e0b;">
+        ⚠ No customer selected — using default model
+      </div>
+    </div>
+
     <button class="btn-analyze" id="btnAnalyze" disabled>
       <span id="btnText">ANALYZE INVOICE</span>
     </button>
@@ -1228,6 +1242,10 @@
       <div class="stat-box">
         <div class="stat-val" id="statTime">—</div>
         <div class="stat-lbl">SECONDS</div>
+      </div>
+      <div class="stat-box" style="min-width:90px;">
+        <div class="stat-val" id="statCustomer" style="font-size:11px;">—</div>
+        <div class="stat-lbl">CUSTOMER MODEL</div>
       </div>
     </div>
 
@@ -2104,6 +2122,7 @@ function renderResults(result) {
   document.getElementById('statLines').textContent = lines;
   document.getElementById('statFields').textContent = fields;
   document.getElementById('statTime').textContent   = elapsed;
+  document.getElementById('statCustomer').textContent = result._extraction_meta?.customer || 'Default';
   document.getElementById('extractionStats').classList.add('show');
 
   // Engine status
@@ -2456,6 +2475,24 @@ sgBtnGen.addEventListener('click', async () => {
 });
 
 // ── Analyze ────────────────────────────────────────────────────────
+// ── Populate customer dropdown from backend ────────────────────────
+(async () => {
+  try {
+    const res  = await fetch('/customers');
+    const list = await res.json();
+    const sel  = document.getElementById('customerSelect');
+    list.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.warn('Could not load customer list', e); }
+})();
+
+document.getElementById('customerSelect').addEventListener('change', function() {
+  document.getElementById('customerWarning').style.display = this.value ? 'none' : 'block';
+});
+
 btnAnalyze.addEventListener('click', async () => {
   if (!selectedFile) return;
 
@@ -2469,6 +2506,8 @@ btnAnalyze.addEventListener('click', async () => {
 
   const fd = new FormData();
   fd.append('file', selectedFile);
+  const customer = document.getElementById('customerSelect').value;
+  if (customer) fd.append('customer', customer);
 
   try {
     const resp = await fetch('/extract', { method:'POST', body:fd });

@@ -175,8 +175,17 @@ COMPARTMENT_ID      = os.getenv("OCI_COMPARTMENT",   CFG["tenancy"])
 NAMESPACE           = os.getenv("OCI_NAMESPACE",     "id0sajugd5y6")
 BUCKET              = os.getenv("OCI_BUCKET",        "DocumentAIBucket")
 
-CUSTOM_MODEL_OCID   = os.getenv("DU_MODEL_OCID",
-    "ocid1.aidocumentmodel.oc1.us-chicago-1.amaaaaaatfjxduaabalpgtjglbpmjywkkggl7ednnjc3ilfazqfs3na3fcrq")
+# ── Customer → DU model map ───────────────────────────────────────────
+# Add new customers here as more models are trained.
+# The key must match exactly what the frontend dropdown sends.
+CUSTOMER_MODELS: dict[str, str] = {
+    "Premier":        "ocid1.aidocumentmodel.oc1.us-chicago-1.amaaaaaatfjxduaack3commqc5swjibzawlxzasupanbvh3535swux6dynbq",
+    "Penske":         "ocid1.aidocumentmodel.oc1.us-chicago-1.amaaaaaatfjxduaalrbzmajqlkbl6suzxt52njeftbgrs4i3qwvodyeebdxa",
+    "Alabama Power":  "ocid1.aidocumentmodel.oc1.us-chicago-1.amaaaaaatfjxduaakw2qlkbdhyq5juw5e6mythrnwymmshzaepj5kdpuwfqa",
+    "LogoSportsWear": "ocid1.aidocumentmodel.oc1.us-chicago-1.amaaaaaatfjxduaadk43pzk5iqegmomuf4sz7thvg6uixuq44wuo2sckb6kq",
+}
+# Fallback — used if no customer is selected or an unknown name is sent
+CUSTOM_MODEL_OCID = os.getenv("DU_MODEL_OCID", list(CUSTOMER_MODELS.values())[0])
 DU_REGION           = os.getenv("DU_REGION",         "us-chicago-1")
 
 GEMINI_MODEL        = os.getenv("GEMINI_MODEL",      "google.gemini-2.5-pro")
@@ -484,12 +493,17 @@ def build_consensus(du,vis,gem):
 # EXTRACTION ENGINES  —  all inline / synchronous, no Object Storage needed
 # ═══════════════════════════════════════════════════════════════════
 
-def run_du(clients, pdf_bytes: bytes) -> dict:
+def run_du(clients, pdf_bytes: bytes, model_id: str = None) -> dict:
     """
     Document Understanding via AnalyzeDocument (inline).
-    Automatically splits PDFs exceeding OCI's 5-page inline limit into
-    chunks, processes each chunk, then merges the results.
+    Pass model_id to use a customer-specific model, or omit to use the default.
     """
+    model_id = model_id or CUSTOM_MODEL_OCID
+
+
+
+
+
     chunks = split_pdf_chunks(pdf_bytes)
     log.info("[DU] Starting AnalyzeDocument — %d chunk(s)", len(chunks))
     results = []
@@ -501,7 +515,7 @@ def run_du(clients, pdf_bytes: bytes) -> dict:
                 document=oci.ai_document.models.InlineDocumentDetails(
                     source="INLINE", data=b64),
                 features=[oci.ai_document.models.DocumentKeyValueExtractionFeature(
-                    model_id=CUSTOM_MODEL_OCID)],
+                    model_id=model_id)],
                 compartment_id=COMPARTMENT_ID,
             )
         )
@@ -1047,6 +1061,12 @@ def serve_ui():
         return jsonify({"error": "trifectai.html not found"}), 404
     return Response(_get_html(), mimetype="text/html")
 
+
+@app.route("/customers")
+@login_required
+def customers():
+    """Return the list of customer names for the frontend dropdown."""
+    return jsonify(list(CUSTOMER_MODELS.keys()))
 @app.route("/extract", methods=["POST"])
 @login_required
 def extract():
@@ -1063,6 +1083,11 @@ def extract():
         }), 400
 
     raw_bytes = f.read()
+
+    # ── Resolve customer model ───────────────────────────────────────
+    customer     = request.form.get("customer", "").strip()
+    du_model_id  = CUSTOMER_MODELS.get(customer, CUSTOM_MODEL_OCID)
+    log.info("[Extract] Customer=%r  model=%s", customer or "(default)", du_model_id)
     file_name = f.filename
     is_image  = ext in IMAGE_EXTENSIONS
     start     = time.time()
@@ -1097,7 +1122,7 @@ def extract():
     # ── Run DU + Vision concurrently ────────────────────────────────
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         # Only submit DU if we have a real PDF (native or converted)
-        fu_du = pool.submit(run_du, clients, pdf_bytes) if can_run_du else None
+        fu_du = pool.submit(run_du, clients, pdf_bytes, du_model_id) if can_run_du else None
 
         # Vision: use the raw-image endpoint if PDF conversion failed,
         # otherwise use the normal PDF path
@@ -1135,6 +1160,7 @@ def extract():
     final["_extraction_meta"] = {
         "source_file":  file_name,
         "file_type":    "image" if is_image else "pdf",
+        "customer":     customer or "Default",
         "elapsed_sec":  round(time.time() - start, 2),
         "engines":      engine_status,
         "timestamp":    time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
